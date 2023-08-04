@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="../static/css/settings.css">
+<script src="../static/script/settings.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishpond - settings</title>
+</head>
+<body>
+    <p class="title">[ Pond system ]</p>
+    
+    <div class="levels-display">
+        <div class="level">
+            <p class="level-title">Pond (73cm)</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="pondHigh">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="pondLow">
+                </div>
+                <div>
+                    <p>Alert time</p>
+                    <input type="number" id="pondAlert">
+                </div>
+                <div>
+                    <p>DFB</p>
+                    <input type="number" id="pondDFB">
+                </div>
+                <div>
+                    <p>Runs</p>
+                    <input type="number" id="pondRuns">
+                </div>
+            </div>
+        </div>
+
+        <div class="level">
+            <p class="level-title">Nexus inner (66cm)</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="innerHigh">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="innerLow">
+                </div>
+                <div>
+                    <p>Alert time</p>
+                    <input type="number" id="innerAlert">
+                </div>
+                <div>
+                    <p>DFB</p>
+                    <input type="number" id="innerDFB">
+                </div>
+                <div>
+                    <p>Runs</p>
+                    <input type="number" id="innerRuns">
+                </div>
+            </div>
+        </div>
+
+        <div class="level">
+            <p class="level-title">Nexus outer (43cm)</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="outerHigh">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="outerLow">
+                </div>
+                <div>
+                    <p>Alert time</p>
+                    <input type="number" id="outerAlert">
+                </div>
+                <div>
+                    <p>DFB</p>
+                    <input type="number" id="outerDFB">
+                </div>
+                <div>
+                    <p>Runs</p>
+                    <input type="number" id="outerRuns">
+                </div>
+            </div>
+        </div>
+
+        <div class="level">
+            <p class="level-title">Tub (40cm)</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="tubHigh">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="tubLow">
+                </div>
+                <div>
+                    <p>Alert time</p>
+                    <input type="number" id="tubAlert">
+                </div>
+                <div>
+                    <p>DFB</p>
+                    <input type="number" id="tubDFB">
+                </div>
+                <div>
+                    <p>Runs</p>
+                    <input type="number" id="tubRuns">
+                </div>
+            </div>
+        </div>
+
+        <div class="level">
+            <p class="level-title">Nexus pump</p>
+            <div class="levels">
+                <div>
+                    <p>Off</p>
+                    <input type="number" id="nPumpOff">
+                </div>
+                <div>
+                    <p>On</p>
+                    <input type="number" id="nPumpOn">
+                </div>
+                <div>
+                    <p>Delay</p>
+                    <input type="number" id="nPumpDelay">
+                </div>
+                <p class="level-title">Tub pump</p>
+                <div>
+                    <p>Off</p>
+                    <input type="number" id="tPumpOff">
+                </div>
+                <div>
+                    <p>On</p>
+                    <input type="number" id="tPumpOn">
+                </div>
+                <div>
+                    <p>Delay</p>
+                    <input type="number" id="tPumpDelay">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="levels-display">
+        <div class="level">
+            <p class="level-title">Pond 3check</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="pondHigh3Check">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="pondLow3Check">
+                </div>
+            </div>
+        </div>
+
+        <div class="level">
+            <p class="level-title">Nexus 3check</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="nexusHigh3Check">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="nexusLow3Check">
+                </div>
+            </div>
+        </div>
+
+        <div class="level">
+            <p class="level-title">Tub 3check</p>
+            <div class="levels">
+                <div>
+                    <p>High</p>
+                    <input type="number" id="tubHigh3Check">
+                </div>
+                <div>
+                    <p>Low</p>
+                    <input type="number" id="tubLow3Check">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div  class="other">
+        <button class="updateBtn" onclick="updateJson()">Update</button>
+    </div>
+</body>
+</html>

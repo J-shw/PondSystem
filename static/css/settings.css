@@ -1,0 +1,183 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+input {
+    max-width: 100%;
+    border: 0px;
+    border-radius: 5px;
+    padding: 5px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: large;
+    font-weight: bold;
+}
+
+.title {
+    margin-top: 2%;
+    font-size: xx-large;
+    text-align: center;
+    width: 100%;
+}
+
+.levels-display {
+    transition: 0.2s;
+    width: 90%;
+    display: flex;
+    flex-grow: 1;
+    margin-top: 4%;
+    margin-right: auto;
+    margin-left: auto;
+}
+.level{
+    flex: auto;
+    width: 15%;
+    margin-left: 1%;
+    margin-right: 1%;
+    padding: 2%;
+    border-radius: 15px;
+}
+.level .levels {
+    transition: 0.2s;
+    text-align: center;
+    border-radius: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+.level .levels div{
+    width: 100%;
+}
+
+.level p {
+    width: 100%;
+    text-align: center;
+    font-size: x-large;
+}
+
+.other {
+    max-width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5%;
+    border-radius: 15px;
+    padding: 2%;
+}
+
+.level-title {
+    font-weight: bold;
+    text-align: center;
+}
+
+.updateBtn {
+    width: 100%;
+    transition: 0.2s;
+    border: 0px;
+    border-radius: 15px;
+    padding: 3%;
+    font-size: xx-large;
+}
+.updateBtn:hover {
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 1000px){
+    body {
+        margin-left: 1%;
+        margin-right: 1%;
+    }
+
+    .title {
+        margin-bottom: 15%;
+    }
+    .days{
+        transition: 0.2s;
+        width: 90%;
+    }
+    .levels-display {
+        display: block;
+        width: 100%;
+        margin-top: 5%;
+    }
+    .level{
+        margin-bottom: 5%;
+        width: 100%;
+        margin-left: 0px;
+        margin-right: 0px;
+        padding-left: 0px;
+        padding-right: 0px;
+        padding-top: 0px;
+        padding-bottom: 10px;
+    }
+    .level p {
+        width: 100%;
+    }
+    input {
+        max-width: 300px;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+     /*
+    White - rgb(24,24,24)
+    Whitesmoke - rgb(31,31,31)
+    */
+    body {
+        background-color: white;
+        color: black;
+    }
+    .other {
+        background-color: whitesmoke;
+    }
+    .level{
+        background-color: whitesmoke;
+    }
+    input {
+        background-color: lightblue;
+        color: black;
+    }
+    .updateBtn {
+        background-color: white;
+        color: black;
+    }
+    .updateBtn:hover {
+        background-color: rgb(9, 188, 9);
+    }
+    .other {
+        max-width: 100%;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: rgb(24,24,24);
+        color: white;
+    }
+    .other {
+        background-color: rgb(31,31,31);
+    }
+    .level{
+        background-color: rgb(31,31,31);
+    }
+    input {
+        background-color: rgb(14, 58, 75); 
+        color: white;
+    }
+    .updateBtn {
+        background-color: rgb(24,24,24);
+        color: white;
+    }
+    .updateBtn:hover {
+        background-color: rgb(20, 104, 20);
+    }
+}

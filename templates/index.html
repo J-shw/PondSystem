@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="../static/css/style.css">
+<link rel="stylesheet" href="../static/css/graphs.css">
+<script src="../static/script/script.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fishpond</title>
+</head>
+<body>
+    <p class="title">[ Pond system ]</p>
+    <br>
+    <br>
+    <div class="services">
+        <div class="left">
+            <p class="status">Service status:</p>
+            <p class="status" id="status">Loading status...</p>
+        </div>
+        <div class="right">
+            <p class="status">Last update:</p>
+            <p class="status" id="update">Pending</p>
+        </div>
+    </div>
+
+    <div class="pondState">
+        <p class="indicator loading" id="pondStatusTraffic">Loading...</p>
+        <p class="info" id="pondStatusInfo">Loading...</p>
+    </div>
+
+    <div class="tempDetails">
+        <p class="temp" id="waterTemp">Loading temp...</p>
+    </div>
+
+    <div class="waterDetails">
+        <div class="box">
+            <p>Pond</p>
+            <div id="pondLevelBar" class="water-color-bar color-bar" data-value="50">
+                <p id="pondLevel">Loading pond level...</p>
+            </div>
+        </div>
+        <div class="indoor">
+            <p>Nexus inner</p>
+            <div id="inLevelBar" class="water-color-bar color-bar" data-value="50">
+                <p id="inLevel">Loading nexus level...</p>
+            </div>
+        </div>
+
+        <div class="outside">
+            <p>Nexus outer</p>
+            <div id="outLevelBar" class="water-color-bar color-bar" data-value="50">
+                <p id="outLevel">Loading nexus level...</p>
+            </div>
+        </div>
+
+        <div class="outside">
+            <p>Tub</p>
+            <div id="tubLevelBar" class="water-color-bar color-bar" data-value="50">
+                <p id="tubLevel">Loading tub level...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="inline-boxes">
+        <div class="water">
+            <div class="status">
+                <div class="watering">
+                    <p class="header">Nexus pump</p>
+                    <p class="indicator loading" id="nexusPump">Loading...</p>
+                </div>
+            </div>
+
+            <div class="status">
+                <div class="watering">
+                    <p class="header">Tub pump</p>
+                    <p class="indicator loading" id="tubPump">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="water">
+            <div class="status">
+                <div class="watering">
+                    <p class="header">Water level:</p>
+                    <p class="header" id="threeCheckLevel">Loading...</p>
+                    <p class="indicator loading" id="watering">Loading...</p>
+                </div>
+            </div>
+
+            <a href="/schedule"><p class="scheduleBtn">Settings</p></a>
+            <a href="/data"><p class="dataBtn">Data</p></a>
+        </div>
+    </div>
+
+    <div class="deviceDetails">
+        <div class="cpu">
+            <p>CPU</p>
+            <div id="cpuTempBar" class="temp-color-bar color-bar" data-value="50">
+                <p id="cpuTemp">Loading cpu temp...</p>
+            </div>
+            <div id="cpuFreqBar" class="freq-color-bar color-bar" data-value="50">
+                <p id="cpuFreq">Loading cpu freq...</p>
+            </div>
+        </div>
+
+        <div class="storage">
+            <p>Storage</p>
+            <div id="storageBar" class="storage-color-bar color-bar" data-value="50">
+                <p id="storage">Loading storage...</p>
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+</body>
+</html>

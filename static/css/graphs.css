@@ -1,0 +1,66 @@
+.color-bar {
+  transition:0.2s;
+  display: block;
+  height: 400px;
+  border-radius: 5px;
+}
+
+.bar-alert{
+  border: 3px;
+  border-style: solid;
+  border-color: red;
+}
+
+@media (prefers-color-scheme: light) {
+  .water-color-bar {
+    transition: 0.2s;
+    background: linear-gradient(to top, rgb(0, 166, 255) 0%, rgb(0, 166, 255) var(--percentage), whitesmoke var(--percentage), whitesmoke 100%);
+  }
+  .temp-color-bar {
+    background: linear-gradient(to top, rgb(255, 64, 0) 0%, rgb(255, 64, 0) var(--percentage), whitesmoke var(--percentage), whitesmoke 100%);
+  }
+  .freq-color-bar {
+    background: linear-gradient(to top, rgb(210, 250, 0) 0%, rgb(210, 250, 0) var(--percentage), whitesmoke var(--percentage), whitesmoke 100%);
+  }
+  .storage-color-bar {
+    background: linear-gradient(to top, rgb(10, 248, 94) 0%, rgb(10, 248, 94) var(--percentage), whitesmoke var(--percentage), whitesmoke 100%);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  .water-color-bar {
+    transition: 0.2s;
+    background: linear-gradient(to top, rgb(40, 133, 230) 0%, rgb(40, 133, 230) var(--percentage), rgb(31,31,31) var(--percentage), rgb(31,31,31) 100%);
+  }
+  .temp-color-bar {
+    background: linear-gradient(to top, rgb(200, 0, 60) 0%, rgb(200, 0, 60) var(--percentage), rgb(31,31,31) var(--percentage), rgb(31,31,31) 100%);
+  }
+  .freq-color-bar {
+    background: linear-gradient(to top, rgb(210, 190, 80) 0%, rgb(210, 190, 80) var(--percentage), rgb(31,31,31) var(--percentage), rgb(31,31,31) 100%);
+  }
+  .storage-color-bar {
+    background: linear-gradient(to top, rgb(10, 150, 30) 0%, rgb(10, 150, 30) var(--percentage), rgb(31,31,31) var(--percentage), rgb(31,31,31) 100%);
+  }
+}
+
+.color-bar[data-value="0"] {
+  --percentage: 0%;
+}
+
+.color-bar[data-value="50"] {
+  --percentage: 50%;
+}
+
+.color-bar[data-value="100"] {
+  --percentage: 100%;
+}
+
+.color-bar[data-value]:not([data-value="0"]):not([data-value="100"]) {
+  --percentage: calc(var(--value)/ 100 * 100%);
+}
+
+@media screen and (max-width: 1000px){
+  .color-bar{
+    transition:0.2s;
+    height: 200px;
+  }
+}

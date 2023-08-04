@@ -1,0 +1,103 @@
+{
+    "updateFreq": {
+        "_description": "Time in seconds between updates",
+        "time": 5
+    },
+    "waterLevels": {
+        "_description": "High & Low water levels",
+        "pond": {
+            "high": 74,
+            "low": 50
+        },
+        "nexusInner": {
+            "high": 68,
+            "low": 51
+        },
+        "nexusOuter": {
+            "high": 46,
+            "low": 20
+        },
+        "tub": {
+            "high": 45,
+            "low": 20
+        },
+        "3Check": {
+            "_description": "High/Low for 3Check system. ",
+            "pond": {
+                "high": 74,
+                "low": 67
+            },
+            "nexus": {
+                "high": 68,
+                "low": 55
+            },
+            "tub": {
+                "high": 45,
+                "low": 38
+            }
+        }
+    },
+    "warningTimes": {
+        "_description": "Delay (in seconds) before alert sent",
+        "pond": 480,
+        "nexusInner": 480,
+        "nexusOuter": 60,
+        "tub": 60
+    },
+    "sensorData": {
+        "_description": "Data to setup/use sensors",
+        "pond": {
+            "DFB": 80,
+            "runs": 20
+        },
+        "nexusInnerLevel": {
+            "DFB": 72,
+            "runs": 20
+        },
+        "nexusOuterLevel": {
+            "DFB": 52,
+            "runs": 20
+        },
+        "tubLevel": {
+            "DFB": 57,
+            "runs": 20
+        }
+    },
+    "pumpControl": {
+        "tubValues": {
+            "on": 40,
+            "off": 25,
+            "delay": 20
+        },
+        "nexusValues": {
+            "on": 40,
+            "off": 25,
+            "delay": 20
+        }
+    },
+    "cleaning": {
+        "schedule": {
+            "Monday": "false",
+            "Tuesday": "true",
+            "Wednesday": "false",
+            "Thursday": "true",
+            "Friday": "false",
+            "Saturday": "true",
+            "Sunday": "false"
+        },
+        "time": "22:00",
+        "duration": 15,
+        "levelBounce": 10
+    },
+    "devices": {
+        "_description": "Stores device name and keys for use with ifttt",
+        "deviceName": [
+            "Josh",
+            "Dad"
+        ],
+        "keys": [
+            "eHJt8MGlmWfbo5dNivgZBC96kp6_Rus_WnrAylMHnwJ",
+            "bQVbMbyfEp_9RlqGwqShJq"
+        ]
+    }
+}
