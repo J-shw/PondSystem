@@ -37,8 +37,11 @@ cleaningEndTime = 0
 # - - - - - - - 
 
 # Pin setup
-refillRelay = 0 # 20?
-emptyRelay = 1 # 21?
+refillRelay = 0 # Find one
+innerAirRelay = 0 # Find one
+OuterAirRelat = 0 # Find one
+blockRelay = 20 # Motor 1
+emptyRelay = 21 # Motor 2
 nexusRelay = 25
 tubRelay = 26
 waterTemp = 4
@@ -342,7 +345,9 @@ def getData(): # Sensor data
         tubL = tubLevel()
     except: tubL = -1
     
-    waterTemp = round(sensor.get_temperature(), 2)
+    try:
+        waterTemp = round(sensor.get_temperature(), 2)
+    except: waterTemp = 0
 
     if pondL <= -1:
         try:pondL = lastPondLevel
