@@ -52,7 +52,7 @@ function getData(){
             tubLow3Check = document.getElementById("tubLow3Check");
 
             monday = document.getElementById("monday");
-            tueday = document.getElementById("tueday");
+            tuesday = document.getElementById("tuesday");
             wednesday = document.getElementById("wednesday");
             thursday = document.getElementById("thursday");
             friday = document.getElementById("friday");
@@ -104,13 +104,13 @@ function getData(){
             tubHigh3Check.value = data['waterLevels']['3Check']['tub']['high'];
             tubLow3Check.value = data['waterLevels']['3Check']['tub']['low'];
 
-            monday.checked = data['cleaning']['schedule']['Monday'];
-            tuesday.checked = data['cleaning']['schedule']['Tuesday'];
-            wednesday.checked = data['cleaning']['schedule']['Wednesday'];
-            thursday.checked = data['cleaning']['schedule']['Thursday'];
-            friday.checked = data['cleaning']['schedule']['friday'];
-            saturday.checked = data['cleaning']['schedule']['Saturday'];
-            sunday.checked = data['cleaning']['schedule']['Sunday'];
+            monday.checked = Boolean(data['cleaning']['schedule']['Monday']);
+            tuesday.checked = Boolean(data['cleaning']['schedule']['Tuesday']);
+            wednesday.checked = Boolean(data['cleaning']['schedule']['Wednesday']);
+            thursday.checked = Boolean(data['cleaning']['schedule']['Thursday']);
+            friday.checked = Boolean(data['cleaning']['schedule']['friday']);
+            saturday.checked = Boolean(data['cleaning']['schedule']['Saturday']);
+            sunday.checked = Boolean(data['cleaning']['schedule']['Sunday']);
 
             cleaningTime.value = data['cleaning']['time']
             cleaningDuration.value = data['cleaning']['duration']
