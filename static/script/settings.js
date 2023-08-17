@@ -104,13 +104,43 @@ function getData(){
             tubHigh3Check.value = data['waterLevels']['3Check']['tub']['high'];
             tubLow3Check.value = data['waterLevels']['3Check']['tub']['low'];
 
-            monday.checked = Boolean(data['cleaning']['schedule']['Monday']);
-            tuesday.checked = Boolean(data['cleaning']['schedule']['Tuesday']);
-            wednesday.checked = Boolean(data['cleaning']['schedule']['Wednesday']);
-            thursday.checked = Boolean(data['cleaning']['schedule']['Thursday']);
-            friday.checked = Boolean(data['cleaning']['schedule']['friday']);
-            saturday.checked = Boolean(data['cleaning']['schedule']['Saturday']);
-            sunday.checked = Boolean(data['cleaning']['schedule']['Sunday']);
+            
+            
+            if (data['cleaning']['schedule']['Monday'] === 'true'){
+                monday.checked = true;
+            }else{
+                monday.checked = false;
+            }
+            if (data['cleaning']['schedule']['Tuesday'] === 'true'){
+                tuesday.checked = true;
+            }else{
+                tuesday.checked = false;
+            }
+            if (data['cleaning']['schedule']['Wednesday'] === 'true'){
+                wednesday.checked = true;
+            }else{
+                wednesday.checked = false;
+            }
+            if (data['cleaning']['schedule']['Thursday'] === 'true'){
+                thursday.checked = true;
+            }else{
+                thursday.checked = false;
+            }
+            if (data['cleaning']['schedule']['Friday'] === 'true'){
+                friday.checked = true;
+            }else{
+                friday.checked = false;
+            }
+            if (data['cleaning']['schedule']['Saturday'] === 'true'){
+                saturday.checked = true;
+            }else{
+                saturday.checked = false;
+            }
+            if (data['cleaning']['schedule']['Sunday'] === 'true'){
+                sunday.checked = true;
+            }else{
+                sunday.checked = false;
+            }
 
             cleaningTime.value = data['cleaning']['time']
             cleaningDuration.value = data['cleaning']['duration']
