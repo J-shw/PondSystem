@@ -6,34 +6,34 @@
     "waterLevels": {
         "_description": "High & Low water levels",
         "pond": {
-            "high": 74,
-            "low": 50
+            "high": 76,
+            "low": 66
         },
         "nexusInner": {
             "high": 68,
             "low": 51
         },
         "nexusOuter": {
-            "high": 46,
+            "high": 50,
             "low": 20
         },
         "tub": {
-            "high": 45,
+            "high": 50,
             "low": 20
         },
         "3Check": {
             "_description": "High/Low for 3Check system. ",
             "pond": {
                 "high": 74,
-                "low": 67
+                "low": 70
             },
             "nexus": {
-                "high": 68,
-                "low": 55
+                "high": 15,
+                "low": 10
             },
             "tub": {
-                "high": 45,
-                "low": 38
+                "high": 60,
+                "low": 55
             }
         }
     },
@@ -85,7 +85,7 @@
             "Saturday": "true",
             "Sunday": "false"
         },
-        "time": "22:00",
+        "time": "22:05",
         "duration": 15,
         "levelBounce": 10
     },
