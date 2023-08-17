@@ -51,6 +51,18 @@ function getData(){
             tubHigh3Check = document.getElementById("tubHigh3Check");
             tubLow3Check = document.getElementById("tubLow3Check");
 
+            monday = document.getElementById("monday");
+            tueday = document.getElementById("tueday");
+            wednesday = document.getElementById("wednesday");
+            thursday = document.getElementById("thursday");
+            friday = document.getElementById("friday");
+            saturday = document.getElementById("saturday");
+            sunday = document.getElementById("sunday");
+
+            cleaningTime = document.getElementById("cleaningTime");
+            cleaningDuration = document.getElementById("cleaningDuration");
+            cleaningLevelBounce = document.getElementById("cleaningLevelBounce");
+
             pondhigh.value = data['waterLevels']['pond']['high'];
             pondLow.value = data['waterLevels']['pond']['low'];
             pondAlert.value = data['warningTimes']['pond'];
@@ -91,6 +103,18 @@ function getData(){
 
             tubHigh3Check.value = data['waterLevels']['3Check']['tub']['high'];
             tubLow3Check.value = data['waterLevels']['3Check']['tub']['low'];
+
+            monday.checked = data['cleaning']['schedule']['Monday'];
+            tuesday.checked = data['cleaning']['schedule']['Tuesday'];
+            wednesday.checked = data['cleaning']['schedule']['Wednesday'];
+            thursday.checked = data['cleaning']['schedule']['Thursday'];
+            friday.checked = data['cleaning']['schedule']['friday'];
+            saturday.checked = data['cleaning']['schedule']['Saturday'];
+            sunday.checked = data['cleaning']['schedule']['Sunday'];
+
+            cleaningTime.value = data['cleaning']['time']
+            cleaningDuration.value = data['cleaning']['duration']
+            cleaningLevelBounce.value = data['cleaning']['levelBounce']
         }
     })
 }
@@ -103,11 +127,17 @@ function updateJson(){
     for (let value in values){
         let element = document.getElementById(values[value])
         let selectValue = element.value;
-
+        if (element.type === 'checkbox'){
+            if (element.checked) {
+                selectValue = true
+            }else {
+                selectValue = false
+            }
+        }
         data.push(selectValue);
     }
 
-    print (data)
+    console.log(data)
     let url = "/process-data"
     let xhttp = new XMLHttpRequest();
 
