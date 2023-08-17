@@ -96,16 +96,18 @@ function getData(){
 }
 
 function updateJson(){
-    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHigh3Check', 'pondLow3Check', 'nexusHigh3Check', 'nexusLow3Check', 'tubHigh3Check', 'tubLow3Check']
+    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHigh3Check', 'pondLow3Check', 'nexusHigh3Check', 'nexusLow3Check', 'tubHigh3Check', 'tubLow3Check', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce']
 
     let data = [];
 
     for (let value in values){
         let element = document.getElementById(values[value])
         let selectValue = element.value;
+
         data.push(selectValue);
     }
 
+    print (data)
     let url = "/process-data"
     let xhttp = new XMLHttpRequest();
 
