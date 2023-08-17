@@ -751,6 +751,20 @@ def updateJson(data : list) -> list:
 
         config['waterLevels']['3Check']['tub']['high'] = int(data[30])
         config['waterLevels']['3Check']['tub']['low'] = int(data[31])
+        
+        config['cleaning']['schedule']['Monday'] = str(data[32]).lower()
+        config['cleaning']['schedule']['Tuesday'] = str(data[33]).lower()
+        config['cleaning']['schedule']['Wednesday'] = str(data[34]).lower()
+        config['cleaning']['schedule']['Thursday'] = str(data[35]).lower()
+        config['cleaning']['schedule']['Friday'] = str(data[36]).lower()
+        config['cleaning']['schedule']['Saturday'] = str(data[37]).lower()
+        config['cleaning']['schedule']['Sunday'] = str(data[38]).lower()
+
+        config['cleaning']['time'] = data[39]
+        config['cleaning']['duration'] = int(data[40])
+        config['cleaning']['levelBounce'] = int(data[41])
+
+
     
 
         # Write the modified object back to the JSON file
