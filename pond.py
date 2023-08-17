@@ -76,7 +76,7 @@ io.setup(tubEcho, io.IN)
 # - - - - - - - 
 
 
-def pondLevel():
+def pondLevel() -> int:
     global pondTrig
     global pondEcho
     distanceFromBottom = configData['sensorData']['pond']['DFB']
@@ -120,7 +120,7 @@ def pondLevel():
 
     return round(waterHeight)
 
-def nexusInnerLevel():
+def nexusInnerLevel() -> int:
     global nInnerTrig
     global nInnerEcho
 
@@ -165,7 +165,7 @@ def nexusInnerLevel():
 
     return round(waterHeight)
 
-def nexusOuterLevel():
+def nexusOuterLevel() -> int:
     global nOuterTrig
     global nOuterEcho
 
@@ -210,7 +210,7 @@ def nexusOuterLevel():
 
     return round(waterHeight)
 
-def tubLevel():
+def tubLevel() -> int:
     global tubTrig
     global tubEcho
 
@@ -255,7 +255,7 @@ def tubLevel():
 
     return round(waterHeight)
 
-def water(state): # on/off the refill system
+def water(state : bool): # on/off the refill system
     global refillRelay
     global waterState
 
@@ -269,7 +269,7 @@ def water(state): # on/off the refill system
             io.output(refillRelay, io.LOW)
     else: return "Invalid operation - System is currently draining"
 
-def empty(state): # on/off the empty system
+def empty(state : bool): # on/off the empty system
     global emptyRelay
     global waterState
 
@@ -371,7 +371,7 @@ def getData(): # Sensor data
 
     data = [pondL, innerL, outerL, tubL, waterTemp, threeCheckValue]
 
-def log(data): # Used to save/log data
+def log(data : list): # Used to save/log data
     global crash
 
     dataToSave = []
@@ -409,7 +409,7 @@ def log(data): # Used to save/log data
     except Exception as e:
         crash = [True, "logging | " +str(e), time.time()]
 
-def systemState(): # return layout - [Status, Running, Crashed, Error]
+def systemState() -> list: # return layout - [Status, Running, Crashed, Error]
     global crash
 
     if crash[0] != True:
@@ -421,12 +421,12 @@ def systemState(): # return layout - [Status, Running, Crashed, Error]
     else:
         return ([200, False, crash[0], crash[1]])
 
-def pondStatus(): # Use to keep track of pond alerts
+def pondStatus() -> list: # Use to keep track of pond alerts
     global pondStateArray
 
     return pondStateArray
 
-def currentData(): # Displays current data on webpage
+def currentData() -> list: # Displays current data on webpage
     global allData
     global waterState
     global nexusPump
@@ -445,7 +445,7 @@ def currentData(): # Displays current data on webpage
 
     return dataToShare
 
-def pondState(allData): # Controls pond systems
+def pondState(allData : list): # Controls pond systems
     global pondStateArray
     global pondStateTime
     global threeCheckValue
@@ -585,7 +585,7 @@ def pondState(allData): # Controls pond systems
     if alert == False:
         alerted = False
 
-def pumpControl(allData):
+def pumpControl(allData : list):
     global pumpTimeData
     global cleaning
 
@@ -610,7 +610,7 @@ def pumpControl(allData):
     elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pumpTimeData[1]:
         pump(2, True) 
 
-def threeCheck(pond: int, nexus: int, tub: int): # Returns the current level of the pond (Using 3 water sensors). retruns - 'Low', 'Ok' or 'High'
+def threeCheck(pond: int, nexus: int, tub: int) -> str: # Returns the current level of the pond (Using 3 water sensors). retruns - 'Low', 'Ok' or 'High'
     global configData
     # This should use the pond sensor, nexus inner senor and the tub sensor
 
@@ -644,7 +644,7 @@ def threeCheck(pond: int, nexus: int, tub: int): # Returns the current level of 
     elif values[1] == -1: return 'Low'
     else: return 'Error'
 
-def cleanMode(allData): # Automatic cleaning
+def cleanMode(allData : list): # Automatic cleaning
     global cleaning
     global cleaningEndTime
     global ofp
@@ -695,12 +695,12 @@ def cleanMode(allData): # Automatic cleaning
 
 
 
-def getConfig():
+def getConfig() -> object:
     global configData
 
     return configData
 
-def updateJson(data):
+def updateJson(data : list) -> list:
     global configPath
 
     try:
@@ -762,7 +762,7 @@ def updateJson(data):
     
     return [200, "None"]
 
-def logCrash(crashData): #Changed this to save actual time not time in long format
+def logCrash(crashData : list): #Changed this to save actual time not time in long format
     filename = crashFilePath+"crash.txt"
 
     crash_time = crashData[2]
