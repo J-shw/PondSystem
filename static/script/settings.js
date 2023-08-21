@@ -42,14 +42,9 @@ function getData(){
             tPumpOn = document.getElementById("tPumpOn");
             tPumpDelay = document.getElementById("tPumpDelay");
 
-            pondHigh3Check = document.getElementById("pondHigh3Check");
-            pondLow3Check = document.getElementById("pondLow3Check");
-
-            nexusHigh3Check = document.getElementById("nexusHigh3Check");
-            nexusLow3Check = document.getElementById("nexusLow3Check");
-
-            tubHigh3Check = document.getElementById("tubHigh3Check");
-            tubLow3Check = document.getElementById("tubLow3Check");
+            pondHighCheck = document.getElementById("pondHighCheck");
+            pondLowCheck = document.getElementById("pondLowCheck");
+            pondOkCheck = document.getElementById("pondOkCheck");
 
             monday = document.getElementById("monday");
             tuesday = document.getElementById("tuesday");
@@ -95,15 +90,9 @@ function getData(){
             tPumpOn.value = data['pumpControl']['tubValues']['on'];
             tPumpDelay.value = data['pumpControl']['tubValues']['delay'];
 
-            pondHigh3Check.value = data['waterLevels']['3Check']['pond']['high'];
-            pondLow3Check.value = data['waterLevels']['3Check']['pond']['low'];
-            
-            nexusHigh3Check.value = data['waterLevels']['3Check']['nexus']['high'];
-            nexusLow3Check.value = data['waterLevels']['3Check']['nexus']['low'];
-
-            tubHigh3Check.value = data['waterLevels']['3Check']['tub']['high'];
-            tubLow3Check.value = data['waterLevels']['3Check']['tub']['low'];
-
+            pondHighCheck.value = data['waterLevels']['levelCheck']['pond']['high'];
+            pondLowCheck.value = data['waterLevels']['levelCheck']['pond']['low'];
+            pondOkCheck.value = data['waterLevels']['levelCheck']['pond']['ok'];
             
             
             if (data['cleaning']['schedule']['Monday'] === 'true'){
@@ -150,7 +139,7 @@ function getData(){
 }
 
 function updateJson(){
-    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHigh3Check', 'pondLow3Check', 'nexusHigh3Check', 'nexusLow3Check', 'tubHigh3Check', 'tubLow3Check', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce']
+    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHighCheck', 'pondLowCheck', 'pondOkCheck', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce']
 
     let data = [];
 
