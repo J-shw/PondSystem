@@ -37,10 +37,10 @@ cleaningEndTime = 0
 # - - - - - - - 
 
 # Pin setup
-refillRelay = 0 # Find one
+refillRelay = 21
 innerAirRelay = 0 # Find one
 OuterAirRelat = 0 # Find one
-emptyRelay = 21 # Motor 1
+emptyRelay = 20 # Motor 1
 nexusRelay = 25
 tubRelay = 26
 waterTemp = 4
@@ -609,6 +609,14 @@ def pumpControl(allData : list):
     elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pumpTimeData[1]:
         pump(2, True) 
 
+def waterControl():
+    global threeCheckValue
+
+    if threeCheckValue == 'Low':
+        water(True)
+    else:
+        water(False)
+    
 def threeCheck(pond: int, nexus: int, tub: int) -> str: # Returns the current level of the pond (Using 3 water sensors). retruns - 'Low', 'Ok' or 'High'
     global configData
     # This should use the pond sensor, nexus inner senor and the tub sensor
@@ -834,7 +842,11 @@ def start():
             pumpControl(allData)
         except Exception as e:
             crash = [True, "pumpControl() | " + str(e), time.time()]
-        
+        try:
+            waterControl()
+        except Exception as e:
+            crash = [True, "waterControl() | " + str(e), time.time()]
+
         try: 
             cleanMode(allData)
         except Exception as e:
