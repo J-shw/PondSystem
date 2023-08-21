@@ -21,19 +21,12 @@
             "high": 50,
             "low": 20
         },
-        "3Check": {
-            "_description": "High/Low for 3Check system. ",
+        "levelCheck": {
+            "_description": "High/Low ",
             "pond": {
                 "high": 74,
-                "low": 70
-            },
-            "nexus": {
-                "high": 15,
-                "low": 10
-            },
-            "tub": {
-                "high": 60,
-                "low": 55
+                "low": 70,
+                "ok": 72
             }
         }
     },
