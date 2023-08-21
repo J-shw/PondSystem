@@ -20,14 +20,14 @@ configData = json.load(configFile)
 # Variables setup
 deviceData = []
 data = []
-threeCheckValue = 'Ok' # 'Ok', 'Low, 'High'
+levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
 waterState = 'Off' # 'Off', 'Filling', 'Draining'
 nexusPump = True
 tubPump = True
 pumpTimeData = [0, 0]
 update = False # Used for webhook
 crash = [False, None, None]
-pondStateArray = [False, "", False, "", False, "", False, "", False, "", "", False, "", False] # [pondLevelState, Message, innerLevelState, Message, outerLevelState, Message, tubLevelState, Message, pondTemp, Message, waterLevel ('Low', 'Ok', 'High'), Cleaning, endtime, ofp (overflow protection)]
+pondStateArray = [False, "", False, "", False, "", False, "", False, "", "Ok", False, "", False] # [pondLevelState, Message, innerLevelState, Message, outerLevelState, Message, tubLevelState, Message, pondTemp, Message, waterLevel ('Low', 'Ok', 'High'), Cleaning, endtime, ofp (overflow protection)]
 pondStateTime = [0,0,0,0,0]
 running = True
 alerted = False
@@ -325,7 +325,7 @@ def getDeviceData(): # Device data
 def getData(): # Sensor data
     global data
     global update
-    global threeCheckValue
+    global levelCheckValue
     global lastPondLevel
     global lastInnerLevel
     global lastOuterLevel
@@ -370,7 +370,7 @@ def getData(): # Sensor data
         except:pass
     else:lastTubLevel = tubL
 
-    data = [pondL, innerL, outerL, tubL, waterTemp, threeCheckValue]
+    data = [pondL, innerL, outerL, tubL, waterTemp, levelCheckValue]
 
 def log(data : list): # Used to save/log data
     global crash
@@ -449,7 +449,7 @@ def currentData() -> list: # Displays current data on webpage
 def pondState(allData : list): # Controls pond systems
     global pondStateArray
     global pondStateTime
-    global threeCheckValue
+    global levelCheckValue
     global alerted
     global cleaning
     global cleaningEndTime
@@ -485,16 +485,16 @@ def pondState(allData : list): # Controls pond systems
     pondStateArray[13] = ofp
 
 
-    threeCheckValue = threeCheck(pondLevel, innerLevel, tubLevel)
+    levelCheckValue = levelCheck(pondLevel)
 
-    if threeCheckValue != 'Ok':
+    if levelCheckValue != 'Ok':
         if pondStateTime[4] == 0:
             pondStateTime[4] = time.time()
         if time.time() >= pondStateTime[4] + 180:
-            pondStateArray[10] = threeCheckValue
+            pondStateArray[10] = levelCheckValue
     else:
         pondStateTime[4] = 0
-        pondStateArray[10] = threeCheckValue
+        pondStateArray[10] = levelCheckValue
 
     # - - -
     if pondLevel > pondLevels[0]:
@@ -611,47 +611,24 @@ def pumpControl(allData : list):
     elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pumpTimeData[1]:
         pump(2, True) 
 
-def waterControl():
-    global threeCheckValue
-
-    if threeCheckValue == 'Low':
-        water(True)
-    else:
-        water(False)
-    
-def threeCheck(pond: int, nexus: int, tub: int) -> str: # Returns the current level of the pond (Using 3 water sensors). retruns - 'Low', 'Ok' or 'High'
+def levelCheck(pond: int) -> str: # Returns the current level of the pond. retruns - 'Low', 'Ok' or 'High'
     global configData
-    # This should use the pond sensor, nexus inner senor and the tub sensor
 
-    values = [0,0,0]
 
     # levels = [high, low]
-    pondLevels = [configData['waterLevels']['3Check']['pond']['high'], configData['waterLevels']['3Check']['pond']['low']] 
-    nexusLevels = [configData['waterLevels']['3Check']['nexus']['high'], configData['waterLevels']['3Check']['nexus']['low']]
-    tubLevels = [configData['waterLevels']['3Check']['tub']['high'], configData['waterLevels']['3Check']['tub']['low']]
+    pondLevels = [configData['waterLevels']['levelCheck']['pond']['high'], configData['waterLevels']['levelCheck']['pond']['low'], configData['waterLevels']['levelCheck']['pond']['ok']] 
+    
 
     # - - -
-    if pond >= pondLevels[0]:
-        values[0] = 1
-    elif pond <= pondLevels[1]:
-        values[0] = -1
-    # - - -
-    if nexus >= nexusLevels[0]:
-        values[1] = 1
-    elif nexus <= nexusLevels[1]:
-        values[1] = -1
-    # - - -
-    if tub >= tubLevels[0]:
-        values[2] = 1
-    elif tub <= tubLevels[1]:
-        values[2] = -1
+    if pond > pondLevels[0]:return 'High'
+    elif pond < pondLevels[1]: 
+        water(True)
+        return 'Low'
 
-    values.sort()
-
-    if values[1] == 0: return 'Ok'
-    elif values[1] == 1: return 'High'
-    elif values[1] == -1: return 'Low'
-    else: return 'Error'
+    elif pond == pondLevels[2]:
+        water(False)
+    
+    return 'Ok'
 
 def cleanMode(allData : list): # Automatic cleaning
     global cleaning
@@ -753,26 +730,21 @@ def updateJson(data : list) -> list:
         config['pumpControl']['tubValues']['on'] = int(data[24])
         config['pumpControl']['tubValues']['delay'] = int(data[25])
 
-        config['waterLevels']['3Check']['pond']['high'] = int(data[26])
-        config['waterLevels']['3Check']['pond']['low'] = int(data[27])
-
-        config['waterLevels']['3Check']['nexus']['high'] = int(data[28])
-        config['waterLevels']['3Check']['nexus']['low'] = int(data[29])
-
-        config['waterLevels']['3Check']['tub']['high'] = int(data[30])
-        config['waterLevels']['3Check']['tub']['low'] = int(data[31])
+        config['waterLevels']['levelCheck']['pond']['high'] = int(data[26])
+        config['waterLevels']['levelCheck']['pond']['low'] = int(data[27])
+        config['waterLevels']['levelCheck']['pond']['ok'] = int(data[28])
         
-        config['cleaning']['schedule']['Monday'] = str(data[32]).lower()
-        config['cleaning']['schedule']['Tuesday'] = str(data[33]).lower()
-        config['cleaning']['schedule']['Wednesday'] = str(data[34]).lower()
-        config['cleaning']['schedule']['Thursday'] = str(data[35]).lower()
-        config['cleaning']['schedule']['Friday'] = str(data[36]).lower()
-        config['cleaning']['schedule']['Saturday'] = str(data[37]).lower()
-        config['cleaning']['schedule']['Sunday'] = str(data[38]).lower()
+        config['cleaning']['schedule']['Monday'] = str(data[29]).lower()
+        config['cleaning']['schedule']['Tuesday'] = str(data[30]).lower()
+        config['cleaning']['schedule']['Wednesday'] = str(data[31]).lower()
+        config['cleaning']['schedule']['Thursday'] = str(data[32]).lower()
+        config['cleaning']['schedule']['Friday'] = str(data[33]).lower()
+        config['cleaning']['schedule']['Saturday'] = str(data[34]).lower()
+        config['cleaning']['schedule']['Sunday'] = str(data[35]).lower()
 
-        config['cleaning']['time'] = data[39]
-        config['cleaning']['duration'] = int(data[40])
-        config['cleaning']['levelBounce'] = int(data[41])
+        config['cleaning']['time'] = data[36]
+        config['cleaning']['duration'] = int(data[37])
+        config['cleaning']['levelBounce'] = int(data[38])
 
 
     
@@ -848,10 +820,6 @@ def start():
                 pumpControl(allData)
             except Exception as e:
                 crash = [True, "pumpControl() | " + str(e), time.time()]
-            try:
-                waterControl()
-            except Exception as e:
-                crash = [True, "waterControl() | " + str(e), time.time()]
 
             try: 
                 cleanMode(allData)
