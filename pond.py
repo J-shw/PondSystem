@@ -265,6 +265,7 @@ def water(state : bool): # on/off the refill system
             io.output(refillRelay, io.HIGH)
         else:
             #Turn water off
+            waterState = 'Off'
             io.output(refillRelay, io.LOW)
     else: return "Invalid operation - System is currently draining"
 
@@ -279,6 +280,7 @@ def empty(state : bool): # on/off the empty system
             io.output(emptyRelay, io.HIGH)
         else:
             #Turn water off
+            waterState = 'Off'
             io.output(emptyRelay, io.LOW)
     else: return "Invalid operation - System is currently filling"
 
@@ -803,53 +805,57 @@ def start():
     global current_time
     global crash
     global allData
-
+    runTime = time.time()
     while running:
-        if crash[0]:
-            logCrash(crash)
 
-        try: 
-            if time.time() >= crash[2] + 30: crash = [False, None, None]
-        except: pass
+        if time.time() >= runTime:
+            runTime = time.time() + configData['updateFreq']['time']
 
-        try:
-            configFile = open(configPath)
-            configData = json.load(configFile)
-        except Exception as e:
-            crash = [True, "config | " +str(e), time.time()]
+            if crash[0]:
+                logCrash(crash)
 
-        # Trigger the water system
-        current_time = datetime.datetime.now()
-        try:
-            getDeviceData()
-        except Exception as e:
-            crash = [True, "getDeviceData() | " +str(e), time.time()]
-        try:
-            getData()
-        except Exception as e:
-            crash = [True, "getData() | " + str(e), time.time()]
-        
-        allData = [data,deviceData]
+            try: 
+                if time.time() >= crash[2] + 30: crash = [False, None, None]
+            except: pass
 
-        log(allData)
+            try:
+                configFile = open(configPath)
+                configData = json.load(configFile)
+            except Exception as e:
+                crash = [True, "config | " +str(e), time.time()]
 
-        try:
-            pondState(allData)
-        except Exception as e:
-            crash = [True, "pondState() | " + str(e), time.time()]
+            # Trigger the water system
+            current_time = datetime.datetime.now()
+            try:
+                getDeviceData()
+            except Exception as e:
+                crash = [True, "getDeviceData() | " +str(e), time.time()]
+            try:
+                getData()
+            except Exception as e:
+                crash = [True, "getData() | " + str(e), time.time()]
+            
+            allData = [data,deviceData]
 
-        try:
-            pumpControl(allData)
-        except Exception as e:
-            crash = [True, "pumpControl() | " + str(e), time.time()]
-        try:
-            waterControl()
-        except Exception as e:
-            crash = [True, "waterControl() | " + str(e), time.time()]
+            log(allData)
 
-        try: 
-            cleanMode(allData)
-        except Exception as e:
-            crash = [True, "cleanMode() | " + str(e), time.time()]
+            try:
+                pondState(allData)
+            except Exception as e:
+                crash = [True, "pondState() | " + str(e), time.time()]
 
-        time.sleep(configData['updateFreq']['time'])
+            try:
+                pumpControl(allData)
+            except Exception as e:
+                crash = [True, "pumpControl() | " + str(e), time.time()]
+            try:
+                waterControl()
+            except Exception as e:
+                crash = [True, "waterControl() | " + str(e), time.time()]
+
+            try: 
+                cleanMode(allData)
+            except Exception as e:
+                crash = [True, "cleanMode() | " + str(e), time.time()]
+
+        time.sleep(0.2)
