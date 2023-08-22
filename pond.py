@@ -620,12 +620,14 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
     
 
     # - - -
-    if pond > pondLevels[0]:return 'High'
+    if pond > pondLevels[0]:
+        water(False)
+        return 'High'
     elif pond < pondLevels[1]: 
         water(True)
         return 'Low'
 
-    elif pond == pondLevels[2]:
+    elif pond >= pondLevels[2]:
         water(False)
     
     return 'Ok'
