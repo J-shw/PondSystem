@@ -485,16 +485,7 @@ def pondState(allData : list): # Controls pond systems
     pondStateArray[13] = ofp
 
 
-    levelCheckValue = levelCheck(pondLevel)
-
-    if levelCheckValue != 'Ok':
-        if pondStateTime[4] == 0:
-            pondStateTime[4] = time.time()
-        if time.time() >= pondStateTime[4] + 180:
-            pondStateArray[10] = levelCheckValue
-    else:
-        pondStateTime[4] = 0
-        pondStateArray[10] = levelCheckValue
+    pondStateArray[10] = levelCheck(pondLevel)
 
     # - - -
     if pondLevel > pondLevels[0]:
@@ -626,7 +617,6 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
     elif pond < pondLevels[1]: 
         water(True)
         return 'Low'
-
     elif pond >= pondLevels[2]:
         water(False)
     
