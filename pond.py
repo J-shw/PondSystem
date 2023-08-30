@@ -648,19 +648,21 @@ def cleanMode(allData : list): # Automatic cleaning
     duration = configData['cleaning']['duration']
     levelBounce = configData['cleaning']['levelBounce']
 
-    if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and cleaning == True:
+    if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and cleaning:
         ofp = True # overflow Protection
-    elif schedule[day_of_week] == 'true'  and cleaning == False:
+    elif schedule[day_of_week] == 'true' and cleaning:
         if str(timeObj) == timeStr:
             cleaning = True
             if time.time() > cleaningEndTime:
                 cleaningEndTime = time.time() + (duration * 60)
 
-    elif time.time() > cleaningEndTime and cleaning == True:
+    elif time.time() > cleaningEndTime and cleaning:
         cleaning = False
 
     if ofp: # Reset ofp
         if outerLevel < nexusOuterMax-levelBounce and innerLevel < nexusInnerMax-levelBounce:
+            ofp = False
+        elif not cleaning:
             ofp = False
 
     if cleaning:
