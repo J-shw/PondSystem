@@ -71,6 +71,7 @@ def process_data():
     else:
         return (jsonify(status=500, data=response[1]))
 
+
 @app.route('/systemState', methods=['GET'])
 def systemState():
     try:
