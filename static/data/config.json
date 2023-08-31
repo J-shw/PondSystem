@@ -6,7 +6,7 @@
     "waterLevels": {
         "_description": "High & Low water levels",
         "pond": {
-            "high": 76,
+            "high": 75,
             "low": 66
         },
         "nexusInner": {
@@ -23,6 +23,7 @@
         },
         "levelCheck": {
             "_description": "High/Low ",
+            "refill": true,
             "pond": {
                 "high": 74,
                 "low": 70,
@@ -32,8 +33,8 @@
     },
     "warningTimes": {
         "_description": "Delay (in seconds) before alert sent",
-        "pond": 480,
-        "nexusInner": 480,
+        "pond": 240,
+        "nexusInner": 60,
         "nexusOuter": 60,
         "tub": 60
     },
@@ -80,7 +81,7 @@
         },
         "time": "22:05",
         "duration": 15,
-        "levelBounce": 10
+        "levelBounce": 5
     },
     "devices": {
         "_description": "Stores device name and keys for use with ifttt",
