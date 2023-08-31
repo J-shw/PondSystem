@@ -484,8 +484,8 @@ def pondState(allData : list): # Controls pond systems
     pondStateArray[12] = cleaningEndTimeStr
     pondStateArray[13] = ofp
 
-
-    pondStateArray[10] = levelCheck(pondLevel)
+    levelCheckValue = levelCheck(pondLevel)
+    pondStateArray[10] = levelCheckValue
 
     # - - -
     if pondLevel > pondLevels[0]:
@@ -614,8 +614,9 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
     if pond > pondLevels[0]:
         water(False)
         return 'High'
-    elif pond < pondLevels[1]: 
-        water(True)
+    elif pond < pondLevels[1]:
+        if configData['waterLevels']['levelCheck']['refill']:
+            water(True)
         return 'Low'
     elif pond >= pondLevels[2]:
         water(False)
@@ -739,6 +740,8 @@ def updateJson(data : list) -> list:
         config['cleaning']['time'] = data[36]
         config['cleaning']['duration'] = int(data[37])
         config['cleaning']['levelBounce'] = int(data[38])
+
+        config['waterLevels']['levelCheck']['refill'] = data(39)
 
 
     
