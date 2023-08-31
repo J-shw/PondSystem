@@ -484,8 +484,10 @@ def pondState(allData : list): # Controls pond systems
     pondStateArray[12] = cleaningEndTimeStr
     pondStateArray[13] = ofp
 
-    levelCheckValue = levelCheck(pondLevel)
-    pondStateArray[10] = levelCheckValue
+    raw_levelCheckValue = levelCheck(pondLevel)
+    if raw_levelCheckValue != None:
+        levelCheckValue = raw_levelCheckValue
+        pondStateArray[10] = levelCheckValue
 
     # - - -
     if pondLevel > pondLevels[0]:
@@ -626,8 +628,9 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
         return 'Low'
     elif pond >= pondLevels[2]:
         water(False)
+        return 'Ok'
     
-    return 'Ok'
+    return None
 
 def cleanMode(allData : list): # Automatic cleaning
     global cleaning
