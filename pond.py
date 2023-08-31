@@ -611,6 +611,10 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
     
     if not configData['waterLevels']['levelCheck']['refill']:
         water(False)
+    
+    if pond < 0:
+        water(False)
+        return 'Low'
 
     # - - -
     if pond > pondLevels[0]:
