@@ -609,6 +609,8 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
     # levels = [high, low]
     pondLevels = [configData['waterLevels']['levelCheck']['pond']['high'], configData['waterLevels']['levelCheck']['pond']['low'], configData['waterLevels']['levelCheck']['pond']['ok']] 
     
+    if not configData['waterLevels']['levelCheck']['refill']:
+        water(False)
 
     # - - -
     if pond > pondLevels[0]:
@@ -741,7 +743,7 @@ def updateJson(data : list) -> list:
         config['cleaning']['duration'] = int(data[37])
         config['cleaning']['levelBounce'] = int(data[38])
 
-        config['waterLevels']['levelCheck']['refill'] = data(39)
+        config['waterLevels']['levelCheck']['refill'] = data[39]
 
 
     
