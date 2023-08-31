@@ -58,7 +58,7 @@ function getData(){
             cleaningDuration = document.getElementById("cleaningDuration");
             cleaningLevelBounce = document.getElementById("cleaningLevelBounce");
 
-            refill = document.getElementById("refill")
+            refill = document.getElementById("refill");
 
             pondhigh.value = data['waterLevels']['pond']['high'];
             pondLow.value = data['waterLevels']['pond']['low'];
@@ -132,7 +132,7 @@ function getData(){
             }else{
                 sunday.checked = false;
             }
-            if (data['waterLevels']['levelCheck']['refill'] === 'true'){
+            if (data['waterLevels']['levelCheck']['refill'] === true){
                 refill.checked = true;
             }else{
                 refill.checked = false;
