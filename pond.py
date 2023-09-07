@@ -606,7 +606,7 @@ def pumpControl(allData : list):
 
 def levelCheck(pond: int) -> str: # Returns the current level of the pond. retruns - 'Low', 'Ok' or 'High'
     global configData
-
+    global pondStateArray
 
     # levels = [high, low]
     pondLevels = [configData['waterLevels']['levelCheck']['pond']['high'], configData['waterLevels']['levelCheck']['pond']['low'], configData['waterLevels']['levelCheck']['pond']['ok']] 
@@ -629,6 +629,9 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
     elif pond >= pondLevels[2]:
         water(False)
         return 'Ok'
+    
+    if pondStateArray[10] == "High":
+        return "Ok"
     
     return None
 
