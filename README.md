@@ -8,3 +8,6 @@ It runs 24/7.
 - A lot of modifications will be needed if you want to use this. (I have not designed this to be shared)
 
 # Modules
+- flask
+- waitress
+- psutil
