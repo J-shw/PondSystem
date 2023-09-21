@@ -767,17 +767,25 @@ def updateJson(data : list) -> list:
     return [200, "None"]
 
 def logCrash(crashData : list): #Changed this to save actual time not time in long format
-    filename = crashFilePath+"crash.txt"
+
+    # [True, "getData() | local variable 'innerL' referenced before assignment", 1689893586.5361037] | 2023-07-20
 
     crash_time = crashData[2]
+    time = datetime.datetime.now()
 
-    formatted_date = current_time.strftime("%Y-%m-%d")
-    formatted_time = crash_time.strftime("%H:%M:%S")
+    formatted_date = time.strftime("%Y-%m-%d")
+    crash_time = crash_time.strftime("%H:%M:%S")
 
-    crashData[2] = formatted_time
+    filename = crashFilePath+str(formatted_date)+".txt"
+    row = str(crashData[1])+", "+str(crash_time)+"\n"
 
-    with open(filename, 'a') as file:
-        file.write(str(crashData)+" | " + str(formatted_date) + "\n")
+    if not os.path.exists(filename):
+        with open(filename, 'w', newline='') as file:
+            file.write(row)
+    else:
+        with open(filename, 'a', newline='') as file:
+            file.write(row)
+
 
     
 def start(): 
