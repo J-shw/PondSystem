@@ -768,8 +768,6 @@ def updateJson(data : list) -> list:
 
 def logCrash(crashData : list): #Changed this to save actual time not time in long format
 
-    # [True, "getData() | local variable 'innerL' referenced before assignment", 1689893586.5361037] | 2023-07-20
-
     crash_time = crashData[2]
     time = datetime.datetime.now()
 
