@@ -663,7 +663,7 @@ def cleanMode(allData : list): # Automatic cleaning
 
     if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and cleaning:
         ofp = True # overflow Protection
-    elif schedule[day_of_week] == 'true' and cleaning:
+    elif schedule[day_of_week] == 'true' and not cleaning:
         if str(timeObj) == timeStr:
             cleaning = True
             if time.time() > cleaningEndTime:
