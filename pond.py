@@ -31,6 +31,7 @@ pondStateArray = [False, "", False, "", False, "", False, "", False, "", "Ok", F
 pondStateTime = [0,0,0,0,0]
 running = True
 alerted = False
+crashAlerted = False
 cleaning = False
 ofp = False
 cleaningEndTime = 0
@@ -572,8 +573,9 @@ def pondState(allData : list): # Controls pond systems
         pondStateTime[3] = 0
     
     if alert and alerted == False and cleaning == False:
-        keys = configData['devices']['keys']
-        response = webhook.send("pondAlert", keys)
+        server = configData['webhook']['server']
+        key = configData['webhook']['keys']['alert']
+        response = webhook.send(server, key)
         if response == 200:
             alerted = True
     if alert == False:
@@ -767,6 +769,7 @@ def updateJson(data : list) -> list:
     return [200, "None"]
 
 def logCrash(crashData : list): #Changed this to save actual time not time in long format
+    global crashAlerted
 
     crash_time = crashData[2]
     time = datetime.datetime.now()
@@ -783,6 +786,13 @@ def logCrash(crashData : list): #Changed this to save actual time not time in lo
     else:
         with open(filename, 'a', newline='') as file:
             file.write(row)
+    
+    if crashAlerted == False:
+        server = configData['webhook']['server']
+        key = configData['webhook']['keys']['crash']
+        response = webhook.send(server, key)
+        if response == 200:
+            alerted = True
 
 
     

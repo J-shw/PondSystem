@@ -7,14 +7,14 @@
         "_description": "High & Low water levels",
         "pond": {
             "high": 75,
-            "low": 66
+            "low": 68
         },
         "nexusInner": {
-            "high": 68,
+            "high": 69,
             "low": 51
         },
         "nexusOuter": {
-            "high": 50,
+            "high": 47,
             "low": 20
         },
         "tub": {
@@ -23,7 +23,7 @@
         },
         "levelCheck": {
             "_description": "High/Low ",
-            "refill": true,
+            "refill": false,
             "pond": {
                 "high": 74,
                 "low": 70,
@@ -71,27 +71,23 @@
     },
     "cleaning": {
         "schedule": {
-            "Monday": "false",
+            "Monday": "true",
             "Tuesday": "true",
-            "Wednesday": "false",
+            "Wednesday": "true",
             "Thursday": "true",
-            "Friday": "false",
+            "Friday": "true",
             "Saturday": "true",
-            "Sunday": "false"
+            "Sunday": "true"
         },
-        "time": "22:05",
-        "duration": 15,
+        "time": "22:45",
+        "duration": 30,
         "levelBounce": 5
     },
-    "devices": {
-        "_description": "Stores device name and keys for use with ifttt",
-        "deviceName": [
-            "Josh",
-            "Dad"
-        ],
-        "keys": [
-            "eHJt8MGlmWfbo5dNivgZBC96kp6_Rus_WnrAylMHnwJ",
-            "bQVbMbyfEp_9RlqGwqShJq"
-        ]
+    "webhook": {
+        "server": "URL_HERE",
+        "keys":{
+            "alert": "ALERT_KEY_HERE",
+            "crash": "CRASH_KEY_HERE"
+        }
     }
 }
