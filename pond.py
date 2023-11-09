@@ -32,6 +32,7 @@ pondStateTime = [0,0,0,0,0]
 running = True
 alerted = False
 crashAlerted = False
+lastCrashTime = 0
 cleaning = False
 ofp = False
 cleaningEndTime = 0
@@ -770,29 +771,36 @@ def updateJson(data : list) -> list:
 
 def logCrash(crashData : list): #Changed this to save actual time not time in long format
     global crashAlerted
+    global crashFilePath
+    global lastCrashTime
 
     crash_time = crashData[2]
-    time = datetime.datetime.now()
+    if crash_time != lastCrashTime:
+        lastCrashTime = crash_time
 
-    formatted_date = time.strftime("%Y-%m-%d")
-    crash_time = crash_time.strftime("%H:%M:%S")
+        time = datetime.datetime.now()
 
-    filename = crashFilePath+str(formatted_date)+".txt"
-    row = str(crashData[1])+", "+str(crash_time)+"\n"
+        formatted_date = time.strftime("%Y-%m-%d")
 
-    if not os.path.exists(filename):
-        with open(filename, 'w', newline='') as file:
-            file.write(row)
-    else:
-        with open(filename, 'a', newline='') as file:
-            file.write(row)
-    
+        time_obj = datetime.datetime.fromtimestamp(crash_time)
+        crash_time = time_obj.strftime("%H:%M:%S")
+
+        filename = f"{crashFilePath}{formatted_date}.txt"
+        row = f"{str(crashData[1])}, {str(crash_time)}\n"
+
+        if not os.path.exists(filename):
+            with open(filename, 'w', newline='') as file:
+                file.write(row)
+        else:
+            with open(filename, 'a', newline='') as file:
+                file.write(row)
+        
     if crashAlerted == False:
         server = configData['webhook']['server']
         key = configData['webhook']['keys']['crash']
         response = webhook.send(server, key)
         if response == 200:
-            alerted = True
+            crashAlerted = True
 
 
     
@@ -802,6 +810,8 @@ def start():
     global current_time
     global crash
     global allData
+    global crashAlerted
+
     runTime = time.time()
     while running:
 
@@ -810,6 +820,9 @@ def start():
 
             if crash[0]:
                 logCrash(crash)
+                
+            else:
+                crashAlerted = False
 
             try: 
                 if time.time() >= crash[2] + 30: crash = [False, None, None]
