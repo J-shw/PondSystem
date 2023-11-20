@@ -718,7 +718,7 @@ def updateJson(data : list) -> list:
     
     return [200, "None"]
 
-def logCrash(crashData : list, crashAlerted : bool, crashFilePath : str, lastCrashTime : float): #Changed this to save actual time not time in long format
+def logCrash(configData, crashData : list, crashAlerted : bool, crashFilePath : str, lastCrashTime : float): #Changed this to save actual time not time in long format
 
     crash_time = crashData[2]
     if crash_time != lastCrashTime:
@@ -764,7 +764,7 @@ def start():
                 pc.crash = [True, "config | " +str(e), time.time()]
 
             if pc.crash[0]:
-                logCrash(pc.crash, pc.crashAlerted, pc.crashFilePath, pc.lastCrashTime)
+                logCrash(configData, pc.crash, pc.crashAlerted, pc.crashFilePath, pc.lastCrashTime)
             else:
                 pc.crashAlerted = False
 
