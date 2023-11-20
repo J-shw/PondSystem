@@ -3,83 +3,83 @@ from datetime import datetime as dt
 from w1thermsensor import W1ThermSensor
 import RPi.GPIO as io
 # import webhook - Maybe use requests instead
-global crash
 
-# File/File paths
-logFilePath = "/home/fish/static/data/logs/"
-crashFilePath = "/home/fish/static/data/crashLogs/"
-logFilesRow = ["pondLevel","nexusInnerLevel","nexusOuterLevel","tubLevel","waterTemp","waterState","cpuTemp","cpuFreq","storageUsed","time"]
-configPath = "/home/fish/static/data/config.json"
-# - - - - - - - 
+class pc:
+    # File/File paths
+    logFilePath = "/home/fish/static/data/logs/"
+    crashFilePath = "/home/fish/static/data/crashLogs/"
+    logFilesRow = ["pondLevel","nexusInnerLevel","nexusOuterLevel","tubLevel","waterTemp","waterState","cpuTemp","cpuFreq","storageUsed","time"]
+    configPath = "/home/fish/static/data/config.json"
+    # - - - - - - - 
 
-# Config data
-configFile = open(configPath)
-configData = json.load(configFile)
-# - - - - - - - 
+    # Variables setup
+    allData = []
+    deviceData = []
+    data = []
+    levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
+    waterState = 'Off' # 'Off', 'Filling', 'Draining'
+    nexusPump = True
+    tubPump = True
+    pumpTimeData = [0, 0]
+    update = False # Used for webhook
+    crash = [False, None, None]
+    pondStateArray = [False, "", False, "", False, "", False, "", False, "", "Ok", False, "", False] # [pondLevelState, Message, innerLevelState, Message, outerLevelState, Message, tubLevelState, Message, pondTemp, Message, waterLevel ('Low', 'Ok', 'High'), Cleaning, endtime, ofp (overflow protection)]
+    pondStateTime = [0,0,0,0,0]
+    alerted = False
+    crashAlerted = False
+    cleaning = False
+    ofp = False
+    cleaningEndTime = 0
+    # - - - - - - - 
 
-# Variables setup
-deviceData = []
-data = []
-levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
-waterState = 'Off' # 'Off', 'Filling', 'Draining'
-nexusPump = True
-tubPump = True
-pumpTimeData = [0, 0]
-update = False # Used for webhook
-crash = [False, None, None]
-pondStateArray = [False, "", False, "", False, "", False, "", False, "", "Ok", False, "", False] # [pondLevelState, Message, innerLevelState, Message, outerLevelState, Message, tubLevelState, Message, pondTemp, Message, waterLevel ('Low', 'Ok', 'High'), Cleaning, endtime, ofp (overflow protection)]
-pondStateTime = [0,0,0,0,0]
-running = True
-alerted = False
-crashAlerted = False
-lastCrashTime = 0
-cleaning = False
-ofp = False
-cleaningEndTime = 0
-# - - - - - - - 
+    # Last check values
+    lastCrashTime = 0
+    lastPondLevel = 0
+    lastInnerLevel = 0
+    lastOuterLevel = 0
+    lastTubLevel = 0
+    # - - - - - - -
 
-# Pin setup
-refillRelay = 21
-innerAirRelay = 0 # Find one
-OuterAirRelat = 0 # Find one
-emptyRelay = 20 # Motor 1
-nexusRelay = 25
-tubRelay = 26
-waterTemp = 4
+    # Pin setup
+    refillRelay = 21
+    innerAirRelay = 0 # Find one
+    OuterAirRelat = 0 # Find one
+    emptyRelay = 20 # Motor 1
+    nexusRelay = 25
+    tubRelay = 26
+    waterTemp = 4
 
-pondTrig = 6
-tubTrig = 2
-nInnerTrig = 23
-nOuterTrig = 27
+    pondTrig = 6
+    tubTrig = 2
+    nInnerTrig = 23
+    nOuterTrig = 27
 
-pondEcho = 5
-tubEcho = 3
-nInnerEcho = 17
-nOuterEcho = 22
-# - - - - - - - 
+    pondEcho = 5
+    tubEcho = 3
+    nInnerEcho = 17
+    nOuterEcho = 22
+    # - - - - - - - 
 
-# Sensors setup
-io.setwarnings(False) 
-io.setmode(io.BCM)
-io.setup(refillRelay, io.OUT)
-io.setup(emptyRelay, io.OUT)
-io.setup(pondTrig, io.OUT)
-io.setup(nInnerTrig, io.OUT)
-io.setup(nOuterTrig, io.OUT)
-io.setup(tubTrig, io.OUT)
-io.setup(nexusRelay, io.OUT)
-io.setup(tubRelay, io.OUT)
+    # Sensors setup
+    io.setwarnings(False) 
+    io.setmode(io.BCM)
+    io.setup(refillRelay, io.OUT)
+    io.setup(emptyRelay, io.OUT)
+    io.setup(pondTrig, io.OUT)
+    io.setup(nInnerTrig, io.OUT)
+    io.setup(nOuterTrig, io.OUT)
+    io.setup(tubTrig, io.OUT)
+    io.setup(nexusRelay, io.OUT)
+    io.setup(tubRelay, io.OUT)
 
-io.setup(pondEcho, io.IN)
-io.setup(nInnerEcho, io.IN)
-io.setup(nOuterEcho, io.IN)
-io.setup(tubEcho, io.IN)
-# - - - - - - - 
+    io.setup(pondEcho, io.IN)
+    io.setup(nInnerEcho, io.IN)
+    io.setup(nOuterEcho, io.IN)
+    io.setup(tubEcho, io.IN)
+    # - - - - - - - 
 
 
-def pondLevel() -> int:
-    global pondTrig
-    global pondEcho
+def pondLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['pond']['DFB']
     runs = configData['sensorData']['pond']['runs']
     array = []
@@ -89,11 +89,11 @@ def pondLevel() -> int:
         run = time.time()
         failed = False
 
-        io.output(pondTrig, True)
+        io.output(pc.pondTrig, True)
         time.sleep(0.00001)
-        io.output(pondTrig, False)
+        io.output(pc.pondTrig, False)
 
-        while io.input(pondEcho) == 0 and failed == False:
+        while io.input(pc.pondEcho) == 0 and failed == False:
             start_time = time.time()
 
             if time.time() >= run+2:
@@ -101,7 +101,7 @@ def pondLevel() -> int:
         
         if failed: return -1
 
-        while io.input(pondEcho) == 1:
+        while io.input(pc.pondEcho) == 1:
             stop_time = time.time()
         
         elapsed_time = stop_time - start_time
@@ -121,10 +121,7 @@ def pondLevel() -> int:
 
     return round(waterHeight)
 
-def nexusInnerLevel() -> int:
-    global nInnerTrig
-    global nInnerEcho
-
+def nexusInnerLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['nexusInnerLevel']['DFB']
     runs = configData['sensorData']['nexusInnerLevel']['runs']
     array = []
@@ -134,11 +131,11 @@ def nexusInnerLevel() -> int:
         run = time.time()
         failed = False
 
-        io.output(nInnerTrig, True)
+        io.output(pc.nInnerTrig, True)
         time.sleep(0.00001)
-        io.output(nInnerTrig, False)
+        io.output(pc.nInnerTrig, False)
 
-        while io.input(nInnerEcho) == 0 and failed == False:
+        while io.input(pc.nInnerEcho) == 0 and failed == False:
             start_time = time.time()
 
             if time.time() >= run+2:
@@ -146,7 +143,7 @@ def nexusInnerLevel() -> int:
         
         if failed: return -1
 
-        while io.input(nInnerEcho) == 1:
+        while io.input(pc.nInnerEcho) == 1:
             stop_time = time.time()
         
         elapsed_time = stop_time - start_time
@@ -166,10 +163,7 @@ def nexusInnerLevel() -> int:
 
     return round(waterHeight)
 
-def nexusOuterLevel() -> int:
-    global nOuterTrig
-    global nOuterEcho
-
+def nexusOuterLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['nexusOuterLevel']['DFB']
     runs = configData['sensorData']['nexusOuterLevel']['runs']
     array = []
@@ -179,11 +173,11 @@ def nexusOuterLevel() -> int:
         run = time.time()
         failed = False
 
-        io.output(nOuterTrig, True)
+        io.output(pc.nOuterTrig, True)
         time.sleep(0.00001)
-        io.output(nOuterTrig, False)
+        io.output(pc.nOuterTrig, False)
 
-        while io.input(nOuterEcho) == 0 and failed == False:
+        while io.input(pc.nOuterEcho) == 0 and failed == False:
             start_time = time.time()
 
             if time.time() >= run+2:
@@ -191,7 +185,7 @@ def nexusOuterLevel() -> int:
         
         if failed: return -1
 
-        while io.input(nOuterEcho) == 1:
+        while io.input(pc.nOuterEcho) == 1:
             stop_time = time.time()
         
         elapsed_time = stop_time - start_time
@@ -211,10 +205,7 @@ def nexusOuterLevel() -> int:
 
     return round(waterHeight)
 
-def tubLevel() -> int:
-    global tubTrig
-    global tubEcho
-
+def tubLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['tubLevel']['DFB']
     runs = configData['sensorData']['tubLevel']['runs']
     array = []
@@ -224,11 +215,11 @@ def tubLevel() -> int:
         run = time.time()
         failed = False
 
-        io.output(tubTrig, True)
+        io.output(pc.tubTrig, True)
         time.sleep(0.00001)
-        io.output(tubTrig, False)
+        io.output(pc.tubTrig, False)
 
-        while io.input(tubEcho) == 0 and failed == False:
+        while io.input(pc.tubEcho) == 0 and failed == False:
             start_time = time.time()
 
             if time.time() >= run+2:
@@ -236,7 +227,7 @@ def tubLevel() -> int:
         
         if failed: return -1
 
-        while io.input(tubEcho) == 1:
+        while io.input(pc.tubEcho) == 1:
             stop_time = time.time()
         
         elapsed_time = stop_time - start_time
@@ -257,61 +248,53 @@ def tubLevel() -> int:
     return round(waterHeight)
 
 def water(state : bool): # on/off the refill system
-    global refillRelay
-    global waterState
 
-    if waterState != "Draining":
+    if pc.waterState != "Draining":
         if state:
             #Turn water on
-            waterState = 'Filling'
-            io.output(refillRelay, io.HIGH)
+            pc.waterState = 'Filling'
+            io.output(pc.refillRelay, io.HIGH)
         else:
             #Turn water off
-            waterState = 'Off'
-            io.output(refillRelay, io.LOW)
+            pc.waterState = 'Off'
+            io.output(pc.refillRelay, io.LOW)
     else: return "Invalid operation - System is currently draining"
 
 def empty(state : bool): # on/off the empty system
-    global emptyRelay
-    global waterState
 
-    if waterState != "Filling":
+    if pc.waterState != "Filling":
         if state:
             #Turn water on
-            waterState = 'Draining'
-            io.output(emptyRelay, io.HIGH)
+            pc.waterState = 'Draining'
+            io.output(pc.emptyRelay, io.HIGH)
         else:
             #Turn water off
-            waterState = 'Off'
-            io.output(emptyRelay, io.LOW)
+            pc.waterState = 'Off'
+            io.output(pc.emptyRelay, io.LOW)
     else: return "Invalid operation - System is currently filling"
 
 def pump(pumpNo : int, state : bool): # on/off specific pump
-    global nexusPump
-    global tubPump
 
     if pumpNo == 1:
         if state:
             #Turn nexus pump on
-            nexusPump = True
-            io.output(nexusRelay, io.LOW)
+            pc.nexusPump = True
+            io.output(pc.nexusRelay, io.LOW)
         else:
             #Turn nexus pump off
-            nexusPump = False
-            io.output(nexusRelay, io.HIGH)
+            pc.nexusPump = False
+            io.output(pc.nexusRelay, io.HIGH)
     elif pumpNo == 2:
         if state:
             #Turn tub pump on
-            tubPump = True
-            io.output(tubRelay, io.LOW)
+            pc.tubPump = True
+            io.output(pc.tubRelay, io.LOW)
         else:
             #Turn tub pump off
-            tubPump = False
-            io.output(tubRelay, io.HIGH)
+            pc.tubPump = False
+            io.output(pc.tubRelay, io.HIGH)
 
 def getDeviceData(): # Device data
-    global deviceData
-    global fanSpeed
 
     freq = psutil.cpu_freq()
     disk = psutil.disk_usage('/')
@@ -322,30 +305,23 @@ def getDeviceData(): # Device data
 
     usedDisk = round(disk.used / (1024*1024*1024), 2) #GB
     
-    deviceData = [cpuTemp,cpuFreq,usedDisk]
+    return [cpuTemp,cpuFreq,usedDisk]
 
-def getData(): # Sensor data
-    global data
-    global update
-    global levelCheckValue
-    global lastPondLevel
-    global lastInnerLevel
-    global lastOuterLevel
-    global lastTubLevel
+def getData(configData, levelCheckValue, lastPondLevel : int, lastInnerLevel : int, lastOuterLevel : int, lastTubLevel : int): # Sensor data
 
     sensor = W1ThermSensor()
 
     try:
-        pondL = pondLevel()
+        pondL = pondLevel(configData)
     except: pondL = -1
     try:
-        innerL = nexusInnerLevel()
+        innerL = nexusInnerLevel(configData)
     except: innerL = -1
     try:
-        outerL = nexusOuterLevel()
+        outerL = nexusOuterLevel(configData)
     except: outerL = -1
     try:
-        tubL = tubLevel()
+        tubL = tubLevel(configData)
     except: tubL = -1
     
     try:
@@ -353,29 +329,28 @@ def getData(): # Sensor data
     except: waterTemp = 0
 
     if pondL <= -1:
-        try:pondL = lastPondLevel
+        try:pondL = pc.lastPondLevel
         except:pass
-    else:lastPondLevel = pondL
+    else:pc.lastPondLevel = pondL
 
     if innerL <= -1:
-        try:innerL = lastInnerLevel
+        try:innerL = pc.lastInnerLevel
         except:pass
-    else:lastInnerLevel = innerL
+    else:pc.lastInnerLevel = innerL
 
     if outerL <= -1:
-        try:outerL = lastOuterLevel
+        try:outerL = pc.lastOuterLevel
         except:pass
-    else:lastOuterLevel = outerL
+    else:pc.lastOuterLevel = outerL
 
     if tubL <= -1:
-        try:tubL = lastTubLevel
+        try:tubL = pc.lastTubLevel
         except:pass
-    else:lastTubLevel = tubL
+    else:pc.lastTubLevel = tubL
 
-    data = [pondL, innerL, outerL, tubL, waterTemp, levelCheckValue]
+    return [pondL, innerL, outerL, tubL, waterTemp, levelCheckValue]
 
-def log(data : list): # Used to save/log data
-    global crash
+def log(data : list, logFilePath : str, logFilesRow : list, current_time : float) : # Used to save/log data
 
     dataToSave = []
 
@@ -391,54 +366,42 @@ def log(data : list): # Used to save/log data
     for x in data:
         for i in x:
             dataToSave.append(i)
-
     formatted_date = current_time.strftime("%Y-%m-%d")
     formatted_time = current_time.strftime("%H:%M:%S")
     dataToSave.append(formatted_time)
 
     filename = logFilePath+formatted_date+".csv"
 
-    try:
-        if not os.path.exists(filename):
-            row = logFilesRow
-            with open(filename, 'w', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow(row)
 
-        # data.append(formatted_time)
-        with open(filename, 'a', newline='') as file:
+    if not os.path.exists(filename):
+        row = logFilesRow
+        with open(filename, 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(dataToSave)
-    except Exception as e:
-        crash = [True, "logging | " +str(e), time.time()]
+            writer.writerow(row)
+
+    # data.append(formatted_time)
+    with open(filename, 'a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(dataToSave)
 
 def systemState() -> list: # return layout - [Status, Running, Crashed, Error]
-    global crash
 
-    if crash[0] != True:
+    if pc.crash[0] != True:
         try:
-            global running
-            return ([200, running, False])
+            return ([200, True, False])
         except Exception as e:
             return([500, None, True, str(e)])
     else:
-        return ([200, False, crash[0], crash[1]])
+        return ([200, False, pc.crash[0], pc.crash[1]])
 
 def pondStatus() -> list: # Use to keep track of pond alerts
-    global pondStateArray
-
-    return pondStateArray
+    return pc.pondStateArray
 
 def currentData() -> list: # Displays current data on webpage
-    global allData
-    global waterState
-    global nexusPump
-    global tubPump
 
+    dataToShare = [pc.waterState, pc.nexusPump, pc.tubPump]
 
-    dataToShare = [waterState, nexusPump, tubPump]
-
-    for x in allData:
+    for x in pc.allData:
         for i in x:
             dataToShare.append(i)
     
@@ -448,14 +411,7 @@ def currentData() -> list: # Displays current data on webpage
 
     return dataToShare
 
-def pondState(allData : list): # Controls pond systems
-    global pondStateArray
-    global pondStateTime
-    global levelCheckValue
-    global alerted
-    global cleaning
-    global cleaningEndTime
-    global ofp
+def pondState(configData, allData : list): # Controls pond systems
 
     waterData = allData[0]
     alert = False
@@ -479,112 +435,110 @@ def pondState(allData : list): # Controls pond systems
     tubLevel = waterData[3]
     waterTemp = waterData[4] # Temp alerts not in use
 
-    endTimeDatetime = dt.fromtimestamp(cleaningEndTime)
+    endTimeDatetime = dt.fromtimestamp(pc.cleaningEndTime)
     cleaningEndTimeStr = endTimeDatetime.strftime('%H:%M')
     
-    pondStateArray[11] = cleaning
-    pondStateArray[12] = cleaningEndTimeStr
-    pondStateArray[13] = ofp
+    pc.pondStateArray[11] = pc.cleaning
+    pc.pondStateArray[12] = cleaningEndTimeStr
+    pc.pondStateArray[13] = pc.ofp
 
-    raw_levelCheckValue = levelCheck(pondLevel)
+    raw_levelCheckValue = levelCheck(configData, pondLevel)
     if raw_levelCheckValue != None:
-        levelCheckValue = raw_levelCheckValue
-        pondStateArray[10] = levelCheckValue
+        pc.levelCheckValue = raw_levelCheckValue
+        pc.pondStateArray[10] = pc.levelCheckValue
 
     # - - -
     if pondLevel > pondLevels[0]:
-        if pondStateTime[0] == 0:
-            pondStateTime[0] = time.time()
-        if time.time() >= pondStateTime[0] + pondWarningTime:
-            pondStateArray[0] = True
-            pondStateArray[1] = "over"
+        if pc.pondStateTime[0] == 0:
+            pc.pondStateTime[0] = time.time()
+        if time.time() >= pc.pondStateTime[0] + pondWarningTime:
+            pc.pondStateArray[0] = True
+            pc.pondStateArray[1] = "over"
             alert = True
 
     elif pondLevel < pondLevels[1]:
-        if pondStateTime[0] == 0:
-            pondStateTime[0] = time.time()
-        if time.time() >= pondStateTime[0] + pondWarningTime:
-            pondStateArray[0] = True
-            pondStateArray[1] = "under"
+        if pc.pondStateTime[0] == 0:
+            pc.pondStateTime[0] = time.time()
+        if time.time() >= pc.pondStateTime[0] + pondWarningTime:
+            pc.pondStateArray[0] = True
+            pc.pondStateArray[1] = "under"
             alert = True
     else:
-        pondStateArray[0] = False
-        pondStateArray[1] = ""
-        pondStateTime[0] = 0
+        pc.pondStateArray[0] = False
+        pc.pondStateArray[1] = ""
+        pc.pondStateTime[0] = 0
 
     # - - -
     if innerLevel > nInnerLevels[0]:
-        if pondStateTime[1] == 0:
-            pondStateTime[1] = time.time()
-        if time.time() >= pondStateTime[1] + nInnerWarningTime:
-            pondStateArray[2] = True
-            pondStateArray[3] = "over"
+        if pc.pondStateTime[1] == 0:
+            pc.pondStateTime[1] = time.time()
+        if time.time() >= pc.pondStateTime[1] + nInnerWarningTime:
+            pc.pondStateArray[2] = True
+            pc.pondStateArray[3] = "over"
             alert = True
 
     elif innerLevel < nInnerLevels[1]:
-        if pondStateTime[1] == 0:
-            pondStateTime[1] = time.time()
-        if time.time() >= pondStateTime[1] + nInnerWarningTime:
-            pondStateArray[2] = True
-            pondStateArray[3] = "under"
+        if pc.pondStateTime[1] == 0:
+            pc.pondStateTime[1] = time.time()
+        if time.time() >= pc.pondStateTime[1] + nInnerWarningTime:
+            pc.pondStateArray[2] = True
+            pc.pondStateArray[3] = "under"
             alert = True
     else:
-        pondStateArray[2] = False
-        pondStateArray[3] = ""
-        pondStateTime[1] = 0
+        pc.pondStateArray[2] = False
+        pc.pondStateArray[3] = ""
+        pc.pondStateTime[1] = 0
     # - - -
     if outerLevel > nOuterLevels[0]:
-        if pondStateTime[2] == 0:
-            pondStateTime[2] = time.time()
-        if time.time() >= pondStateTime[2] + nOuterWarningTime:
-            pondStateArray[4] = True
-            pondStateArray[5] = "over"
+        if pc.pondStateTime[2] == 0:
+            pc.pondStateTime[2] = time.time()
+        if time.time() >= pc.pondStateTime[2] + nOuterWarningTime:
+            pc.pondStateArray[4] = True
+            pc.pondStateArray[5] = "over"
             alert = True
 
     elif outerLevel < nOuterLevels[1]:
-        if pondStateTime[2] == 0:
-            pondStateTime[2] = time.time()
-        if time.time() >= pondStateTime[2] + nOuterWarningTime:
-            pondStateArray[4] = True
-            pondStateArray[5] = "under"
+        if pc.pondStateTime[2] == 0:
+            pc.pondStateTime[2] = time.time()
+        if time.time() >= pc.pondStateTime[2] + nOuterWarningTime:
+            pc.pondStateArray[4] = True
+            pc.pondStateArray[5] = "under"
             alert = True
     else:
-        pondStateArray[4] = False
-        pondStateArray[5] = ""
-        pondStateTime[2] = 0
+        pc.pondStateArray[4] = False
+        pc.pondStateArray[5] = ""
+        pc.pondStateTime[2] = 0
     # - - -
     if tubLevel > tubLevels[0]:
-        if pondStateTime[3] == 0:
-            pondStateTime[3] = time.time()
-        if time.time() >= pondStateTime[3] + tubWarningTime:
-            pondStateArray[6] = True
-            pondStateArray[7] = "over"
+        if pc.pondStateTime[3] == 0:
+            pc.pondStateTime[3] = time.time()
+        if time.time() >= pc.pondStateTime[3] + tubWarningTime:
+            pc.pondStateArray[6] = True
+            pc.pondStateArray[7] = "over"
             alert = True
 
     elif tubLevel < tubLevels[1]:
-        if pondStateTime[3] == 0:
-            pondStateTime[3] = time.time()
-        if time.time() >= pondStateTime[3] + tubWarningTime:
-            pondStateArray[6] = True
-            pondStateArray[7] = "under"
+        if pc.pondStateTime[3] == 0:
+            pc.pondStateTime[3] = time.time()
+        if time.time() >= pc.pondStateTime[3] + tubWarningTime:
+            pc.pondStateArray[6] = True
+            pc.pondStateArray[7] = "under"
             alert = True
     else:
-        pondStateArray[6] = False
-        pondStateArray[7] = ""
-        pondStateTime[3] = 0
+        pc.pondStateArray[6] = False
+        pc.pondStateArray[7] = ""
+        pc.pondStateTime[3] = 0
     
-    if alert and alerted == False and cleaning == False:
+    if alert and pc.alerted == False and pc.cleaning == False:
         server = configData['webhook']['server']
         key = configData['webhook']['keys']['alert']
         response = webhook.send(server, key)
         if response == 200:
-            alerted = True
+            pc.alerted = True
     if alert == False:
-        alerted = False
+        pc.alerted = False
 
-def pumpControl(allData : list):
-    global pumpTimeData
-    global cleaning
+def pumpControl(configData, allData : list):
 
     nexusValues = configData['pumpControl']['nexusValues']
     tubValues = configData['pumpControl']['tubValues']
@@ -594,22 +548,20 @@ def pumpControl(allData : list):
     outerLevel = waterData[2]
     tubLevel = waterData[3]
 
-    if not cleaning:
+    if not pc.cleaning:
         if outerLevel <= nexusValues['off']:
-            pumpTimeData[0] = time.time()
+            pc.pumpTimeData[0] = time.time()
             pump(1, False)
-        elif outerLevel >= nexusValues['on'] and time.time()+nexusValues['delay'] > pumpTimeData[0]:
+        elif outerLevel >= nexusValues['on'] and time.time()+nexusValues['delay'] > pc.pumpTimeData[0]:
             pump(1, True)
     
     if tubLevel <= tubValues['off']:
-        pumpTimeData[1] = time.time()
+        pc.pumpTimeData[1] = time.time()
         pump(2, False)
-    elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pumpTimeData[1]:
+    elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pc.pumpTimeData[1]:
         pump(2, True) 
-
-def levelCheck(pond: int) -> str: # Returns the current level of the pond. retruns - 'Low', 'Ok' or 'High'
-    global configData
-    global pondStateArray
+ 
+def levelCheck(configData, pond: int) -> str: # Returns the current level of the pond. retruns - 'Low', 'Ok' or 'High'
 
     # levels = [high, low]
     pondLevels = [configData['waterLevels']['levelCheck']['pond']['high'], configData['waterLevels']['levelCheck']['pond']['low'], configData['waterLevels']['levelCheck']['pond']['ok']] 
@@ -633,15 +585,12 @@ def levelCheck(pond: int) -> str: # Returns the current level of the pond. retru
         water(False)
         return 'Ok'
     
-    if pondStateArray[10] == "High":
+    if pc.pondStateArray[10] == "High":
         return "Ok"
     
     return None
 
-def cleanMode(allData : list): # Automatic cleaning
-    global cleaning
-    global cleaningEndTime
-    global ofp
+def cleanMode(configData, allData : list): # Automatic cleaning
 
     waterData = allData[0]
     outerLevel = waterData[2]
@@ -664,44 +613,44 @@ def cleanMode(allData : list): # Automatic cleaning
     duration = configData['cleaning']['duration']
     levelBounce = configData['cleaning']['levelBounce']
 
-    if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and cleaning:
-        ofp = True # overflow Protection
-    elif schedule[day_of_week] == 'true' and not cleaning:
+    if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and pc.cleaning:
+        pc.ofp = True # overflow Protection
+    elif schedule[day_of_week] == 'true' and not pc.cleaning:
         if str(timeObj) == timeStr:
-            cleaning = True
-            if time.time() > cleaningEndTime:
-                cleaningEndTime = time.time() + (duration * 60)
+            pc.cleaning = True
+            if time.time() > pc.cleaningEndTime:
+                pc.cleaningEndTime = time.time() + (duration * 60)
 
-    elif time.time() > cleaningEndTime and cleaning:
-        cleaning = False
+    elif time.time() > pc.cleaningEndTime and pc.cleaning:
+        pc.cleaning = False
 
-    if ofp: # Reset ofp
+    if pc.ofp: # Reset ofp
         if outerLevel < nexusOuterMax-levelBounce and innerLevel < nexusInnerMax-levelBounce:
-            ofp = False
-        elif not cleaning:
-            ofp = False
+            pc.ofp = False
+        elif not pc.cleaning:
+            pc.ofp = False
 
-    if cleaning:
+    if pc.cleaning:
         # This will hold auto drainage and air system
         # For now it will slow the water flow and allow dirt
         # to settle on the floor
-        if not ofp:
+        if not pc.ofp:
             pump(1, False)
         else: pump(1, True)
 
 
 
 def getConfig() -> object:
-    global configData
+
+    with open(pc.configPath) as config_file:
+        configData = json.load(config_file)
 
     return configData
 
 def updateJson(data : list) -> list:
-    global configPath
-
     try:
         # Load the existing JSON data from the file
-        with open(configPath, "r") as infile:
+        with open(pc.configPath, "r") as infile:
             config = json.load(infile)
         
         config['waterLevels']['pond']['high'] = int(data[0])
@@ -762,17 +711,14 @@ def updateJson(data : list) -> list:
     
 
         # Write the modified object back to the JSON file
-        with open(configPath, "w") as outfile:
+        with open(pc.configPath, "w") as outfile:
             json.dump(config, outfile, indent=4)
     except Exception as e:
         return [500, str(e)]
     
     return [200, "None"]
 
-def logCrash(crashData : list): #Changed this to save actual time not time in long format
-    global crashAlerted
-    global crashFilePath
-    global lastCrashTime
+def logCrash(crashData : list, crashAlerted : bool, crashFilePath : str, lastCrashTime : float): #Changed this to save actual time not time in long format
 
     crash_time = crashData[2]
     if crash_time != lastCrashTime:
@@ -802,66 +748,63 @@ def logCrash(crashData : list): #Changed this to save actual time not time in lo
         if response == 200:
             crashAlerted = True
 
-
-    
+ 
 def start(): 
-    global configFile
-    global configData
-    global current_time
-    global crash
-    global allData
-    global crashAlerted
 
-    runTime = time.time()
-    while running:
-
+    runTime = 0
+    while True:
         if time.time() >= runTime:
-            runTime = time.time() + configData['updateFreq']['time']
 
-            if crash[0]:
-                logCrash(crash)
-                
+            try:
+                with open(pc.configPath) as config_file:
+                    configData = json.load(config_file)
+
+                runTime = time.time() + configData['updateFreq']['time']
+            except Exception as e:
+                pc.crash = [True, "config | " +str(e), time.time()]
+
+            if pc.crash[0]:
+                logCrash(pc.crash, pc.crashAlerted, pc.crashFilePath, pc.lastCrashTime)
             else:
-                crashAlerted = False
+                pc.crashAlerted = False
 
             try: 
-                if time.time() >= crash[2] + 30: crash = [False, None, None]
+                if time.time() >= pc.crash[2] + 30: pc.crash = [False, None, None]
             except: pass
 
-            try:
-                configFile = open(configPath)
-                configData = json.load(configFile)
-            except Exception as e:
-                crash = [True, "config | " +str(e), time.time()]
+            current_time = datetime.datetime.now() # Used for logging date/time
 
-            # Trigger the water system
-            current_time = datetime.datetime.now()
+            # Collect data
             try:
-                getDeviceData()
+                pc.deviceData = getDeviceData()
             except Exception as e:
-                crash = [True, "getDeviceData() | " +str(e), time.time()]
+                pc.crash = [True, "getDeviceData() | " +str(e), time.time()]
             try:
-                getData()
+                pc.data = getData(configData, pc.levelCheckValue, pc.lastPondLevel, pc.lastInnerLevel, pc.lastOuterLevel, pc.lastTubLevel)
             except Exception as e:
-                crash = [True, "getData() | " + str(e), time.time()]
+                pc.crash = [True, "getData() | " + str(e), time.time()]
             
-            allData = [data,deviceData]
-
-            log(allData)
-
-            try:
-                pondState(allData)
-            except Exception as e:
-                crash = [True, "pondState() | " + str(e), time.time()]
+            pc.allData = [pc.data, pc.deviceData]
+            # - - - - - - -
 
             try:
-                pumpControl(allData)
+                log(pc.allData, pc.logFilePath, pc.logFilesRow, current_time)
             except Exception as e:
-                crash = [True, "pumpControl() | " + str(e), time.time()]
+                pc.crash = [True, "log() | " +str(e), time.time()]
+
+            try:
+                pondState(configData, pc.allData)
+            except Exception as e:
+                pc.crash = [True, "pondState() | " + str(e), time.time()]
+
+            try:
+                pumpControl(configData, pc.allData)
+            except Exception as e:
+                pc.crash = [True, "pumpControl() | " + str(e), time.time()]
 
             try: 
-                cleanMode(allData)
+                cleanMode(configData, pc.allData)
             except Exception as e:
-                crash = [True, "cleanMode() | " + str(e), time.time()]
+                pc.crash = [True, "cleanMode() | " + str(e), time.time()]
 
         time.sleep(0.2)
