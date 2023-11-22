@@ -119,7 +119,7 @@ def pondLevel(configData) -> int:
         # handle the StatisticsError exception
         waterHeight = distanceFromBottom - distance_cm
 
-    return round(waterHeight)
+    return round(waterHeight,1)
 
 def nexusInnerLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['nexusInnerLevel']['DFB']
@@ -161,7 +161,7 @@ def nexusInnerLevel(configData) -> int:
         # handle the StatisticsError exception
         waterHeight = distanceFromBottom - distance_cm
 
-    return round(waterHeight)
+    return round(waterHeight,1)
 
 def nexusOuterLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['nexusOuterLevel']['DFB']
@@ -203,7 +203,7 @@ def nexusOuterLevel(configData) -> int:
         # handle the StatisticsError exception
         waterHeight = distanceFromBottom - distance_cm
 
-    return round(waterHeight)
+    return round(waterHeight,1)
 
 def tubLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['tubLevel']['DFB']
@@ -245,7 +245,7 @@ def tubLevel(configData) -> int:
         # handle the StatisticsError exception
         waterHeight = distanceFromBottom - distance_cm
 
-    return round(waterHeight)
+    return round(waterHeight,1)
 
 def water(state : bool): # on/off the refill system
 
