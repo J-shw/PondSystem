@@ -208,7 +208,7 @@ function displayCurrentData(data){
     waterTemp.innerHTML = data[7]+"°C";
 
     cpuTemp.innerHTML = data[9]+"°C";
-    let cpuTempPer = data[9]/40 * 100;
+    let cpuTempPer = data[9]/45 * 100;
     cpuTempBar.dataset.value = cpuTempPer;
 
     cpuFreq.innerHTML = data[10]+"Mhz";
