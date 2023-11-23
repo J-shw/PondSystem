@@ -446,7 +446,14 @@ def pondState(configData, allData : list): # Controls pond systems
     if raw_levelCheckValue != None:
         pc.levelCheckValue = raw_levelCheckValue
         pc.pondStateArray[10] = pc.levelCheckValue
-
+    
+    if pc.levelCheckValue == 'Low' and pondLevel > 0:
+        if not configData['waterLevels']['levelCheck']['refill']:
+            water(False)
+        else:
+            water(True)
+    else:
+        water(False)
     # - - -
     if pondLevel > pondLevels[0]:
         if pc.pondStateTime[0] == 0:
@@ -566,23 +573,15 @@ def levelCheck(configData, pond: int) -> str: # Returns the current level of the
     # levels = [high, low]
     pondLevels = [configData['waterLevels']['levelCheck']['pond']['high'], configData['waterLevels']['levelCheck']['pond']['low'], configData['waterLevels']['levelCheck']['pond']['ok']] 
     
-    if not configData['waterLevels']['levelCheck']['refill']:
-        water(False)
-    
     if pond < 0:
-        water(False)
         return 'Low'
 
     # - - -
     if pond > pondLevels[0]:
-        water(False)
         return 'High'
     elif pond < pondLevels[1]:
-        if configData['waterLevels']['levelCheck']['refill']:
-            water(True)
         return 'Low'
     elif pond >= pondLevels[2]:
-        water(False)
         return 'Ok'
     
     if pc.pondStateArray[10] == "High":
