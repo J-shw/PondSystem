@@ -155,7 +155,6 @@ function getData(startDate,endDate){
 function loadCharts(all_data){
   // all_data [[raw_data, date],[raw_data, date],[raw_data, date],[raw_data, date]]
   // raw_data = [pondLevel, nInnerLevel, nOuterLevel, waterTemp?, clarity?, cpuTemp, cpuFreq, usedDisk, time]
-
   pondLevel(all_data)
   innerLevel(all_data)
   outerLevel(all_data)
@@ -187,7 +186,12 @@ function pondLevel(all_data) { //Line chart | pond level
 
     for (let j = 0; j < raw_data.length; j++) {
       if (raw_data[j][9] !==null){
-        let time = raw_data[j][9];
+        let time;
+        if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+         time = raw_data[j][13];
+        }else{
+          time = raw_data[j][9];
+        }
         let level = parseFloat(raw_data[j][0]);
 
         let timeArr = time.split(":");
@@ -244,7 +248,12 @@ function innerLevel(all_data) { //Line chart | inner enxus level
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let level = parseFloat(raw_data[j][1]);
 
       let timeArr = time.split(":");
@@ -300,7 +309,12 @@ function outerLevel(all_data) { //Line chart | outerLevel Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let level = parseFloat(raw_data[j][2]);
 
       let timeArr = time.split(":");
@@ -356,7 +370,12 @@ function tubLevel(all_data) { //Line chart | tubLevel Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let level = parseFloat(raw_data[j][3]);
 
       let timeArr = time.split(":");
@@ -412,7 +431,12 @@ function waterTemp(all_data) { //Line chart | temp Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let temp = parseFloat(raw_data[j][4]);
 
       let timeArr = time.split(":");
@@ -468,7 +492,12 @@ function waterState(all_data) { //Line chart | state Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let state = parseFloat(raw_data[j][5]);
 
       let timeArr = time.split(":");
@@ -524,7 +553,12 @@ function cpuTemp(all_data) { //Line chart | temp Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let temp = parseFloat(raw_data[j][6]);
 
       let timeArr = time.split(":");
@@ -580,7 +614,12 @@ function cpuFreq(all_data) { //Line chart | frequency Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let freq = parseFloat(raw_data[j][7]);
 
       let timeArr = time.split(":");
