@@ -581,19 +581,22 @@ def pumpControl(configData, allData : list):
 
     outerLevel = waterData[2]
     tubLevel = waterData[3]
-
-    if not pc.cleaning:
-        if outerLevel <= nexusValues['off']:
-            pc.pumpTimeData[0] = time.time()
-            pump(1, False)
-        elif outerLevel >= nexusValues['on'] and time.time()+nexusValues['delay'] > pc.pumpTimeData[0]:
-            pump(1, True)
-    
-    if tubLevel <= tubValues['off']:
-        pc.pumpTimeData[1] = time.time()
-        pump(2, False)
-    elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pc.pumpTimeData[1]:
-        pump(2, True) 
+    if configData['pumpControl']['enabled']:
+        if not pc.cleaning:
+            if outerLevel <= nexusValues['off']:
+                pc.pumpTimeData[0] = time.time()
+                pump(1, False)
+            elif outerLevel >= nexusValues['on'] and time.time()+nexusValues['delay'] > pc.pumpTimeData[0]:
+                pump(1, True)
+        
+        if tubLevel <= tubValues['off']:
+            pc.pumpTimeData[1] = time.time()
+            pump(2, False)
+        elif tubLevel >= tubValues['on'] and time.time()+tubValues['delay'] > pc.pumpTimeData[1]:
+            pump(2, True) 
+    else:
+        pump(1, True)
+        pump(2, True)
  
 def levelCheck(configData, pond: int) -> str: # Returns the current level of the pond. retruns - 'Low', 'Ok' or 'High'
 
@@ -730,6 +733,7 @@ def updateJson(data : list) -> list:
         config['cleaning']['levelBounce'] = int(data[38])
 
         config['waterLevels']['levelCheck']['refill'] = data[39]
+        config['pumpControl']['enabled'] = data[40]
 
 
     
