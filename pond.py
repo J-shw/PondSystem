@@ -621,6 +621,9 @@ def levelCheck(configData, pond: int) -> str: # Returns the current level of the
 
 def cleanMode(configData, allData : list): # Automatic cleaning
 
+    if not configData['pumpControl']['enabled']:
+        return
+
     waterData = allData[0]
     outerLevel = waterData[2]
 
