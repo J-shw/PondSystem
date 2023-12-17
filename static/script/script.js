@@ -61,7 +61,8 @@ function getPondStatus(){
         if(data.status != 200){
             console.log("Get pond status error - " + data.error + " | " + data.status);
         }else{
-            data = data.data
+            let sensorState = data.data[1];
+            data = data.data[0];
 
             if (data[10] == "Ok"){
                 threeCheck.innerHTML = 'Ok'
@@ -141,6 +142,28 @@ function getPondStatus(){
                 }
                 statusInfo.innerHTML = message;
                 trafficInd.innerHTML = errors + " Errors"
+
+                // Amber alerts - Used for inaccurate data
+                if (sensorState[0]){
+                    pond.classList.add("amber-alert");
+                }else{
+                    pond.classList.remove("amber-alert");
+                }
+                if (sensorState[1]){
+                    inner.classList.add("amber-alert");
+                }else{
+                    inner.classList.remove("amber-alert");
+                }
+                if (sensorState[2]){
+                    outer.classList.add("amber-alert");
+                }else{
+                    outer.classList.remove("amber-alert");
+                }
+                if (sensorState[3]){
+                    tub.classList.add("amber-alert");
+                }else{
+                    tub.classList.remove("amber-alert");
+                }
             }
 
         }

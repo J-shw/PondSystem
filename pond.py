@@ -1,4 +1,4 @@
-import time, datetime, os, psutil, csv, json, webhook, statistics
+import time, datetime, os, psutil, csv, json, modules.webhook as webhook, statistics
 from datetime import datetime as dt
 from w1thermsensor import W1ThermSensor
 import RPi.GPIO as io
@@ -8,7 +8,7 @@ class pc:
     # File/File paths
     logFilePath = "/home/fish/static/data/logs/"
     crashFilePath = "/home/fish/static/data/crashLogs/"
-    logFilesRow = ["pondLevel","nexusInnerLevel","nexusOuterLevel","tubLevel","waterTemp","waterState","cpuTemp","cpuFreq","storageUsed","time"]
+    logFilesRow = ["pondLevel","nexusInnerLevel","nexusOuterLevel","tubLevel","waterTemp","waterState","cpuTemp","cpuFreq","storageUsed","time", "Pond", "Inner", "Outer", "Tub"]
     configPath = "/home/fish/static/data/config.json"
     # - - - - - - - 
 
@@ -78,6 +78,9 @@ class pc:
     io.setup(tubEcho, io.IN)
     # - - - - - - - 
 
+class state:
+    # Sensors | True = Good, False = Bad | pond, inner, outer, tub
+    levelSensors = [True, True, True, True]
 
 def pondLevel(configData) -> int:
     distanceFromBottom = configData['sensorData']['pond']['DFB']
@@ -99,7 +102,11 @@ def pondLevel(configData) -> int:
             if time.time() >= run+2:
                 failed = True
         
-        if failed: return -1
+        if failed:
+            state.levelSensors[0] = False
+            return -1
+        else:
+            state.levelSensors[0] = True
 
         while io.input(pc.pondEcho) == 1:
             stop_time = time.time()
@@ -141,7 +148,11 @@ def nexusInnerLevel(configData) -> int:
             if time.time() >= run+2:
                 failed = True
         
-        if failed: return -1
+        if failed:
+            state.levelSensors[1] = False
+            return -1
+        else:
+            state.levelSensors[1] = True
 
         while io.input(pc.nInnerEcho) == 1:
             stop_time = time.time()
@@ -183,7 +194,11 @@ def nexusOuterLevel(configData) -> int:
             if time.time() >= run+2:
                 failed = True
         
-        if failed: return -1
+        if failed:
+            state.levelSensors[2] = False
+            return -1
+        else:
+            state.levelSensors[2] = True
 
         while io.input(pc.nOuterEcho) == 1:
             stop_time = time.time()
@@ -225,7 +240,11 @@ def tubLevel(configData) -> int:
             if time.time() >= run+2:
                 failed = True
         
-        if failed: return -1
+        if failed:
+            state.levelSensors[3] = False
+            return -1
+        else:
+            state.levelSensors[3] = True
 
         while io.input(pc.tubEcho) == 1:
             stop_time = time.time()
@@ -307,22 +326,30 @@ def getDeviceData(): # Device data
     
     return [cpuTemp,cpuFreq,usedDisk]
 
-def getData(configData, levelCheckValue, lastPondLevel : int, lastInnerLevel : int, lastOuterLevel : int, lastTubLevel : int): # Sensor data
+def getData(configData, levelCheckValue): # Sensor data
 
     sensor = W1ThermSensor()
 
     try:
         pondL = pondLevel(configData)
-    except: pondL = -1
+    except: 
+        state.levelSensors[0] = False
+        pondL = -1
     try:
         innerL = nexusInnerLevel(configData)
-    except: innerL = -1
+    except: 
+        state.levelSensors[1] = False
+        innerL = -1
     try:
         outerL = nexusOuterLevel(configData)
-    except: outerL = -1
+    except: 
+        state.levelSensors[2] = False
+        outerL = -1
     try:
         tubL = tubLevel(configData)
-    except: tubL = -1
+    except: 
+        state.levelSensors[3] = False
+        tubL = -1
     
     try:
         waterTemp = round(sensor.get_temperature(), 2)
@@ -395,7 +422,7 @@ def systemState() -> list: # return layout - [Status, Running, Crashed, Error]
         return ([200, False, pc.crash[0], pc.crash[1]])
 
 def pondStatus() -> list: # Use to keep track of pond alerts
-    return pc.pondStateArray
+    return [pc.pondStateArray, state.levelSensors]
 
 def currentData() -> list: # Displays current data on webpage
 
@@ -637,8 +664,6 @@ def cleanMode(configData, allData : list): # Automatic cleaning
             pump(1, False)
         else: pump(1, True)
 
-
-
 def getConfig() -> object:
 
     with open(pc.configPath) as config_file:
@@ -779,11 +804,11 @@ def start():
             except Exception as e:
                 pc.crash = [True, "getDeviceData() | " +str(e), time.time()]
             try:
-                pc.data = getData(configData, pc.levelCheckValue, pc.lastPondLevel, pc.lastInnerLevel, pc.lastOuterLevel, pc.lastTubLevel)
+                pc.data = getData(configData, pc.levelCheckValue)
             except Exception as e:
                 pc.crash = [True, "getData() | " + str(e), time.time()]
             
-            pc.allData = [pc.data, pc.deviceData]
+            pc.allData = [pc.data, pc.deviceData, state.levelSensors]
             # - - - - - - -
 
             try:
