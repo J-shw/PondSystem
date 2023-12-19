@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <link rel="stylesheet" href="../static/css/data.css">
 <script src="../static/script/data.js"></script>
 <head>
@@ -27,14 +28,13 @@
         <button id="today" onclick="today()">Today</button>
         <button id="yesturday" onclick="yesturday()">Yesterday</button>
         <button id="7days" onclick="quickDate(7)">7 Days</button>
-        <button id="15days" onclick="quickDate(15)">15 Days</button>
-        <button id="30days" onclick="quickDate(30)">30 days</button>
         <p>Auto update</p>
         <button id="autoUpdate" onclick="autoUpdate()" class="off">Off</button>
     </div>
 
     <div class="controls">
-        <button id="download" onclick="downloadData()">Download data</button>
+        <!-- <button id="download" onclick="downloadData()">Download data</button> -->
+        <input id="reduction" type="number" placeholder="Data reduction" value="30" title="How many rows to skip from the read data"> 
     </div>
 
     <div class="airData">
@@ -63,4 +63,11 @@
 
     
 </body>
+<script>
+    document.getElementById('reduction').addEventListener('input', function() {
+        // This function will be called when the textbox value changes
+        let loadData = reduceData(saveData)
+        loadCharts(loadData);
+    });
+</script>
 </html>
