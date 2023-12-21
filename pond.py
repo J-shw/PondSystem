@@ -8,7 +8,7 @@ class pc:
     # File/File paths
     logFilePath = "/home/fish/static/data/logs/"
     crashFilePath = "/home/fish/static/data/crashLogs/"
-    logFilesRow = ["pondLevel","nexusInnerLevel","nexusOuterLevel","tubLevel","waterTemp","waterState","cpuTemp","cpuFreq","storageUsed","time", "Pond", "Inner", "Outer", "Tub"]
+    logFilesRow = ["pondLevel","nexusInnerLevel","nexusOuterLevel","tubLevel","waterTemp","waterState","cpuTemp","cpuFreq","storageUsed", "Pond", "Inner", "Outer", "Tub", "time"]
     configPath = "/home/fish/static/data/config.json"
     # - - - - - - - 
 
