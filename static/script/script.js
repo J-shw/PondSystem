@@ -144,22 +144,22 @@ function getPondStatus(){
                 trafficInd.innerHTML = errors + " Errors"
 
                 // Amber alerts - Used for inaccurate data
-                if (sensorState[0]){
+                if (! sensorState[0]){
                     pond.classList.add("amber-alert");
                 }else{
                     pond.classList.remove("amber-alert");
                 }
-                if (sensorState[1]){
+                if (! sensorState[1]){
                     inner.classList.add("amber-alert");
                 }else{
                     inner.classList.remove("amber-alert");
                 }
-                if (sensorState[2]){
+                if (! sensorState[2]){
                     outer.classList.add("amber-alert");
                 }else{
                     outer.classList.remove("amber-alert");
                 }
-                if (sensorState[3]){
+                if (! sensorState[3]){
                     tub.classList.add("amber-alert");
                 }else{
                     tub.classList.remove("amber-alert");
