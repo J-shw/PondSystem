@@ -24,6 +24,7 @@
         "levelCheck": {
             "_description": "High/Low ",
             "refill": false,
+            "autoShutoff": true,
             "pond": {
                 "high": 74,
                 "low": 70,

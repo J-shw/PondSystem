@@ -480,7 +480,11 @@ def pondState(configData, allData : list): # Controls pond systems
         else:
             water(True)
     else:
+        if configData['waterLevels']['levelCheck']['autoShutoff'] and pc.waterState == 'Filling':
+            refillShutOff()
         water(False)
+
+
     # - - -
     if pondLevel > pondLevels[0]:
         if pc.pondStateTime[0] == 0:
@@ -676,6 +680,20 @@ def getConfig() -> object:
         configData = json.load(config_file)
 
     return configData
+
+def refillShutOff(): # Turns off refill mode
+    try:
+        # Load the existing JSON data from the file
+        with open(pc.configPath, "r") as infile:
+            config = json.load(infile)
+        
+        config['waterLevels']['levelCheck']['refill'] = False
+        # Write the modified object back to the JSON file
+        with open(pc.configPath, "w") as outfile:
+            json.dump(config, outfile, indent=4)
+    except Exception as e:
+        pc.crash = [True, "refillShutOff() | " + str(e), time.time()]
+    
 
 def updateJson(data : list) -> list:
     try:
