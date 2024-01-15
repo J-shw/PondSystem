@@ -25,6 +25,9 @@
   .storage-color-bar {
     background: linear-gradient(to top, rgb(10, 248, 94) 0%, rgb(10, 248, 94) var(--percentage), whitesmoke var(--percentage), whitesmoke 100%);
   }
+  .amber-alert {
+    background: linear-gradient(to top, #FFCB2E 0%, #FFCB2E var(--percentage), whitesmoke var(--percentage), whitesmoke 100%);
+  }
 }
 @media (prefers-color-scheme: dark) {
   .water-color-bar {
@@ -39,6 +42,9 @@
   }
   .storage-color-bar {
     background: linear-gradient(to top, rgb(10, 150, 30) 0%, rgb(10, 150, 30) var(--percentage), rgb(31,31,31) var(--percentage), rgb(31,31,31) 100%);
+  }
+  .amber-alert {
+    background: linear-gradient(to top, #FFCB2E 0%, #FFCB2E var(--percentage), rgb(31,31,31) var(--percentage), rgb(31,31,31) 100%);
   }
 }
 

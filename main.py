@@ -143,8 +143,24 @@ def dataBetween(startDate, endDate): # "2023-04-09", "2023-04-16"
 
                             # Convert the contents into a stream and pass it to the CSV reader
                             data_reader = csv.reader(contents.splitlines(), delimiter=',', quotechar='"')
-                            data = list(data_reader)
-                            data.pop(0)  # remove the first element
+                            # data = list(data_reader)
+                            # data.pop(0)  # remove the first element
+
+                            # Define the number of rows to skip (assuming 5 seconds interval)
+                            # rows_to_skip = 5 * 60  # 5 minutes * 60 seconds
+                            # data = []
+                            # i = 1
+                            # nextRow = 1
+                            # # Read and process every nth row
+                            # while i < len(data_reader):
+                            #     if i == nextRow:
+                            #         data.append(data_reader[i])
+                            #         nextRow=i+300
+                            #     i+=1
+                            # for i in range(1, len(data_reader), 300):
+                            #     data.append(data_reader[i])
+
+
                         data_send.append([data, date])
                     except:
                         pass

@@ -16,6 +16,9 @@
     .water {
         background-color: whitesmoke;
     }
+    .tempDetails .temp {
+        background-color: whitesmoke;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,6 +33,9 @@
         background-color: rgb(31,31,31);
     }
     .water {
+        background-color: rgb(31,31,31);
+    }
+    .tempDetails .temp {
         background-color: rgb(31,31,31);
     }
 }
@@ -119,6 +125,10 @@ body {
 .tempDetails .temp {
     text-align: center;
     font-size: larger;
+    border-radius: 5px;
+    padding: 5px;
+    width: 200px;
+    margin: auto auto;
 }
 
 .waterDetails {

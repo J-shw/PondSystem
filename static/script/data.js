@@ -1,9 +1,3 @@
-// Load the Visualization API and the corechart package.
-google.charts.load('current', {'packages':['corechart']});
-
-// Set a callback to run when the Google Visualization API is loaded.
-google.charts.setOnLoadCallback(today);
-
 let saveData = [];
 let auto = false;
 
@@ -12,6 +6,25 @@ function update(){
     hour()
   }
 }
+
+function reduceData(data){
+  let newData = []
+  let reduction = parseInt(document.getElementById('reduction').value);
+  data.forEach(date => {
+    let i = 0
+    let nextRow = 0
+    let newRowData = []
+    date[0].forEach(row => {
+      if (i == nextRow){
+        newRowData.push(row);
+        nextRow = i + reduction
+      }
+      i++;
+    });
+    newData.push([newRowData, date[1]])
+  });
+  return newData;
+};
 
 function autoUpdate(){
   let button = document.getElementById("autoUpdate")
@@ -57,13 +70,18 @@ function hour(){
         console.log("Get status error - " + data.data + " | " + data.status);
       }else{
         let rawData = data.data;
-        let saveData = rawData[0][0]
+        let dataRows = rawData[0][0]
         let date = rawData[0][1]
         let newdata = []
         let selectedTimes = []
 
-        for (let data of saveData) {
-          const timeParts = data[9].split(":");
+        for (let data of dataRows) {
+          let timeParts;
+          if (data[9] == "True" |data[9] == "False"){
+            timeParts = data[13].split(":");
+          }else{
+            timeParts = data[9].split(":");
+          }
           const hour = Number(timeParts[0]);
           const minute = Number(timeParts[1]);
           const second = Number(timeParts[2]);
@@ -79,8 +97,10 @@ function hour(){
         }
         let store = [selectedTimes, date]
         newdata.push(store)
+        saveData = newData;
         resetBtn();
-        loadCharts(newdata);
+        let hourData = reduceData(newData)
+        loadCharts(hourData);
       };
     });
 }
@@ -148,14 +168,14 @@ function getData(startDate,endDate){
       }else{
         saveData = data.data;
         resetBtn();
-        loadCharts(saveData);
+        let showData = reduceData(saveData);
+        loadCharts(showData);
       };
     });
 }
 function loadCharts(all_data){
   // all_data [[raw_data, date],[raw_data, date],[raw_data, date],[raw_data, date]]
   // raw_data = [pondLevel, nInnerLevel, nOuterLevel, waterTemp?, clarity?, cpuTemp, cpuFreq, usedDisk, time]
-
   pondLevel(all_data)
   innerLevel(all_data)
   outerLevel(all_data)
@@ -167,11 +187,6 @@ function loadCharts(all_data){
 }
 
 function pondLevel(all_data) { //Line chart | pond level
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Level');
-
   // add data to the table
   var data = [];
 
@@ -187,7 +202,12 @@ function pondLevel(all_data) { //Line chart | pond level
 
     for (let j = 0; j < raw_data.length; j++) {
       if (raw_data[j][9] !==null){
-        let time = raw_data[j][9];
+        let time;
+        if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+         time = raw_data[j][13];
+        }else{
+          time = raw_data[j][9];
+        }
         let level = parseFloat(raw_data[j][0]);
 
         let timeArr = time.split(":");
@@ -203,33 +223,28 @@ function pondLevel(all_data) { //Line chart | pond level
     }
   }
 
-  gData.addRows(data);
-
-  var options = {
-    title: 'Pond level',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Level', minValue: 0, maxValue: 75}
-    },
-    series: {
-        0: {targetAxisIndex: 0, color: "blue"}
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
-    }
+  // Create a trace (a series in the plot)
+  var trace = {
+    x: data.map(point => point[0]),
+    y: data.map(point => point[1]),
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Level'
   };
 
-  var chart = new google.visualization.LineChart(document.getElementById('pondLevel'));
-  chart.draw(gData, options);
+  // Create the layout for the plot
+  var layout = {
+    title: 'Pond level',
+    xaxis: { title: 'Datetime' },
+    yaxis: { title: 'Level' }
+  };
+
+  // Combine the trace and layout to create the plot
+  var plotData = [trace];
+  Plotly.newPlot('pondLevel', plotData, layout);
 }
 
 function innerLevel(all_data) { //Line chart | inner enxus level
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Level');
-
   // add data to the table
   var data = [];
 
@@ -244,7 +259,12 @@ function innerLevel(all_data) { //Line chart | inner enxus level
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let level = parseFloat(raw_data[j][1]);
 
       let timeArr = time.split(":");
@@ -258,34 +278,28 @@ function innerLevel(all_data) { //Line chart | inner enxus level
       data.push([ datetime, level ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'Inside nexus level',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Level', minValue: 0, maxValue: 72}
-    },
-    series: {
-        0: {targetAxisIndex: 0, color: "blue"}
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
-    }
-  };
-
-  var chart = new google.visualization.LineChart(document.getElementById('innerLevel'));
-  chart.draw(gData, options);
+    // Create a trace (a series in the plot)
+    var trace = {
+      x: data.map(point => point[0]),
+      y: data.map(point => point[1]),
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Level'
+    };
+  
+    // Create the layout for the plot
+    var layout = {
+      title: 'Inside nexus level',
+      xaxis: { title: 'Datetime' },
+      yaxis: { title: 'Level' }
+    };
+  
+    // Combine the trace and layout to create the plot
+    var plotData = [trace];
+    Plotly.newPlot('innerLevel', plotData, layout);
 }
 
 function outerLevel(all_data) { //Line chart | outerLevel Vs time
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Level');
-
   // add data to the table
   var data = [];
 
@@ -300,7 +314,12 @@ function outerLevel(all_data) { //Line chart | outerLevel Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let level = parseFloat(raw_data[j][2]);
 
       let timeArr = time.split(":");
@@ -314,34 +333,28 @@ function outerLevel(all_data) { //Line chart | outerLevel Vs time
       data.push([ datetime, level ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'Outer nexus level',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Level', minValue: 0, maxValue: 52}
-    },
-    series: {
-        0: {targetAxisIndex: 0, color: "blue"}
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
-    }
-  };
-
-  var chart = new google.visualization.LineChart(document.getElementById('outerLevel'));
-  chart.draw(gData, options);
+    // Create a trace (a series in the plot)
+    var trace = {
+      x: data.map(point => point[0]),
+      y: data.map(point => point[1]),
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Level'
+    };
+  
+    // Create the layout for the plot
+    var layout = {
+      title: 'Outer nexus level',
+      xaxis: { title: 'Datetime' },
+      yaxis: { title: 'Level' }
+    };
+  
+    // Combine the trace and layout to create the plot
+    var plotData = [trace];
+    Plotly.newPlot('outerLevel', plotData, layout);
 }
 
 function tubLevel(all_data) { //Line chart | tubLevel Vs time
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Level');
-
   // add data to the table
   var data = [];
 
@@ -356,7 +369,12 @@ function tubLevel(all_data) { //Line chart | tubLevel Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let level = parseFloat(raw_data[j][3]);
 
       let timeArr = time.split(":");
@@ -370,34 +388,28 @@ function tubLevel(all_data) { //Line chart | tubLevel Vs time
       data.push([ datetime, level ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'Tub level',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Level', minValue: 0, maxValue: 53}
-    },
-    series: {
-        0: {targetAxisIndex: 0, color: "blue"}
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
-    }
-  };
-
-  var chart = new google.visualization.LineChart(document.getElementById('tubLevel'));
-  chart.draw(gData, options);
+    // Create a trace (a series in the plot)
+    var trace = {
+      x: data.map(point => point[0]),
+      y: data.map(point => point[1]),
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Level'
+    };
+  
+    // Create the layout for the plot
+    var layout = {
+      title: 'Tub level',
+      xaxis: { title: 'Datetime' },
+      yaxis: { title: 'Level' }
+    };
+  
+    // Combine the trace and layout to create the plot
+    var plotData = [trace];
+    Plotly.newPlot('tubLevel', plotData, layout);
 }
 
 function waterTemp(all_data) { //Line chart | temp Vs time
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Temperature');
-
   // add data to the table
   var data = [];
 
@@ -412,7 +424,12 @@ function waterTemp(all_data) { //Line chart | temp Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let temp = parseFloat(raw_data[j][4]);
 
       let timeArr = time.split(":");
@@ -426,34 +443,34 @@ function waterTemp(all_data) { //Line chart | temp Vs time
       data.push([ datetime, temp ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'Water Temperature',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Temperature', minValue: 5, maxValue: 25},
-    },
-    series: {
-        0: {targetAxisIndex: 0, color: "red"},
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
-    }
-  };
-
-  var chart = new google.visualization.LineChart(document.getElementById('waterTemp'));
-  chart.draw(gData, options);
+    // Create a trace (a series in the plot)
+    var trace = {
+      x: data.map(point => point[0]),
+      y: data.map(point => point[1]),
+      type: 'scatter',
+      mode: 'lines+markers',
+      name: 'Temperature',
+      line: {
+        color: 'red'  // Set the line color
+      },
+      marker: {
+        color: 'red'  // Set the marker color
+      }
+    };
+  
+    // Create the layout for the plot
+    var layout = {
+      title: 'Water temperature',
+      xaxis: { title: 'Datetime' },
+      yaxis: { title: 'Level' }
+    };
+  
+    // Combine the trace and layout to create the plot
+    var plotData = [trace];
+    Plotly.newPlot('waterTemp', plotData, layout);
 }
 
 function waterState(all_data) { //Line chart | state Vs time
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'State');
-
   // add data to the table
   var data = [];
 
@@ -468,7 +485,12 @@ function waterState(all_data) { //Line chart | state Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let state = parseFloat(raw_data[j][5]);
 
       let timeArr = time.split(":");
@@ -482,34 +504,34 @@ function waterState(all_data) { //Line chart | state Vs time
       data.push([ datetime, state ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'Water State',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'State', minValue: -1, maxValue: 1},
+  // Create a trace (a series in the plot)
+  var trace = {
+    x: data.map(point => point[0]),
+    y: data.map(point => point[1]),
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'State',
+    line: {
+      color: 'green'  // Set the line color
     },
-    series: {
-        0: {targetAxisIndex: 0, color: "green"},
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
+    marker: {
+      color: 'green'  // Set the marker color
     }
   };
 
-  var chart = new google.visualization.LineChart(document.getElementById('waterState'));
-  chart.draw(gData, options);
+  // Create the layout for the plot
+  var layout = {
+    title: 'Water state',
+    xaxis: { title: 'Datetime' },
+    yaxis: { title: 'Level' }
+  };
+
+  // Combine the trace and layout to create the plot
+  var plotData = [trace];
+  Plotly.newPlot('waterState', plotData, layout);
 }
 
 function cpuTemp(all_data) { //Line chart | temp Vs time
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Temperature');
-
   // add data to the table
   var data = [];
 
@@ -524,7 +546,12 @@ function cpuTemp(all_data) { //Line chart | temp Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let temp = parseFloat(raw_data[j][6]);
 
       let timeArr = time.split(":");
@@ -538,34 +565,34 @@ function cpuTemp(all_data) { //Line chart | temp Vs time
       data.push([ datetime, temp ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'CPU Temperature',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Temperature', minValue: 15, maxValue: 40},
+  // Create a trace (a series in the plot)
+  var trace = {
+    x: data.map(point => point[0]),
+    y: data.map(point => point[1]),
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'Temperature',
+    line: {
+      color: 'red'  // Set the line color
     },
-    series: {
-        0: {targetAxisIndex: 0, color: "red"},
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
+    marker: {
+      color: 'red'  // Set the marker color
     }
   };
 
-  var chart = new google.visualization.LineChart(document.getElementById('cpuTemp'));
-  chart.draw(gData, options);
+  // Create the layout for the plot
+  var layout = {
+    title: 'CPU temperature',
+    xaxis: { title: 'Datetime' },
+    yaxis: { title: 'temperature' }
+  };
+
+  // Combine the trace and layout to create the plot
+  var plotData = [trace];
+  Plotly.newPlot('cpuTemp', plotData, layout);
 }
 
 function cpuFreq(all_data) { //Line chart | frequency Vs time
-
-  var gData = new google.visualization.DataTable();
-  gData.addColumn('datetime', 'Time');
-  gData.addColumn('number', 'Frequency');
-
   // add data to the table
   var data = [];
 
@@ -580,7 +607,12 @@ function cpuFreq(all_data) { //Line chart | frequency Vs time
     let day = dateParts[2];
 
     for (let j = 0; j < raw_data.length; j++) {
-      let time = raw_data[j][9];
+      let time;
+      if (raw_data[j][9] == "True" |raw_data[j][9] == "False"){
+        time = raw_data[j][13];
+      }else{
+        time = raw_data[j][9];
+      }
       let freq = parseFloat(raw_data[j][7]);
 
       let timeArr = time.split(":");
@@ -594,31 +626,36 @@ function cpuFreq(all_data) { //Line chart | frequency Vs time
       data.push([ datetime, freq ]);
     }
   }
-
-  gData.addRows(data);
-
-  var options = {
-    title: 'CPU Frequency',
-    curveType: 'function',
-    legend: { position: 'bottom' },
-    vAxes: {
-       0: {title: 'Frequency', minValue: 600, maxValue: 1000},
+  // Create a trace (a series in the plot)
+  var trace = {
+    x: data.map(point => point[0]),
+    y: data.map(point => point[1]),
+    type: 'scatter',
+    mode: 'lines+markers',
+    name: 'CPU frequency',
+    line: {
+      color: 'darkblue'  // Set the line color
     },
-    series: {
-        0: {targetAxisIndex: 0, color: "darkblue"},
-    },
-    hAxis: {
-      format: 'yyyy-mm-ddTHH:mm:ss'
+    marker: {
+      color: 'darkblue'  // Set the marker color
     }
   };
 
-  var chart = new google.visualization.LineChart(document.getElementById('cpuFreq'));
-  chart.draw(gData, options);
+  // Create the layout for the plot
+  var layout = {
+    title: 'CPU frequency',
+    xaxis: { title: 'Datetime' },
+    yaxis: { title: 'frequency' }
+  };
+
+  // Combine the trace and layout to create the plot
+  var plotData = [trace];
+  Plotly.newPlot('cpuFreq', plotData, layout);
 }
 
 function resetBtn(){
-  const buttons = ["hour","today", "yesturday", "7days", "15days", "30days"]
-  const text = ["Hour","Today", "Yesturday", "7 Days", "15 Days", "30 Days"]
+  const buttons = ["hour","today", "yesturday", "7days"]
+  const text = ["Hour","Today", "Yesturday", "7 Days"]
   for (x in buttons){
     let button = document.getElementById(buttons[x])
     button.innerHTML = text[x];
@@ -632,7 +669,6 @@ function downloadData(){
 
   for (row in saveData){
     let date = saveData[row][1];
-    console.log(date)
     let temp = [];
     let i =0;
     for (item in saveData[row][0][i]){

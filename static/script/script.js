@@ -61,7 +61,30 @@ function getPondStatus(){
         if(data.status != 200){
             console.log("Get pond status error - " + data.error + " | " + data.status);
         }else{
-            data = data.data
+            let sensorState = data.data[1];
+            // Amber alerts - Used for inaccurate data
+            if (! sensorState[0]){
+                pond.classList.add("amber-alert");
+            }else{
+                pond.classList.remove("amber-alert");
+            }
+            if (! sensorState[1]){
+                inner.classList.add("amber-alert");
+            }else{
+                inner.classList.remove("amber-alert");
+            }
+            if (! sensorState[2]){
+                outer.classList.add("amber-alert");
+            }else{
+                outer.classList.remove("amber-alert");
+            }
+            if (! sensorState[3]){
+                tub.classList.add("amber-alert");
+            }else{
+                tub.classList.remove("amber-alert");
+            }
+            
+            data = data.data[0];
 
             if (data[10] == "Ok"){
                 threeCheck.innerHTML = 'Ok'
@@ -162,8 +185,8 @@ function getCurrentData(){
 };
 
 function displayCurrentData(data){
-    // data = [refilling, nexusPump, tubPump, pondLevel, nInnerLevel, nOuterLevel, tubLevel, waterTemp, clarity?, cpuTemp, cpuFreq, usedDisk, update]
-    // Array(12) [ false, true, true, 70, 40, -1, 37, 19, 0, 35.78, 800, 1.47, 13:33 ]
+    // data = [refilling, nexusPump, tubPump, pondLevel, nInnerLevel, nOuterLevel, tubLevel, waterTemp, clarity?, cpuTemp, cpuFreq, usedDisk, pondSensor, innerSensor, outerSensor, tubSensor, update]
+    // Array(17) [ false, true, true, 70, 40, -1, 37, 19, 0, 35.78, 800, 1.47, true, true, true, true, 13:33 ]
 
     const pondLevel = document.getElementById("pondLevel");
     const inLevel = document.getElementById("inLevel");
@@ -187,7 +210,7 @@ function displayCurrentData(data){
     const storageBar = document.getElementById('storageBar');
 
     const update = document.getElementById('update');
-    update.innerHTML = data[12];
+    update.innerHTML = data[16];
 
     pondLevel.innerHTML = data[3]+"cm";
     let pondLevelPer = (data[3] / 80) * 100

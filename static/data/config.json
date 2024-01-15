@@ -58,6 +58,7 @@
         }
     },
     "pumpControl": {
+        "enabled": true,
         "tubValues": {
             "on": 40,
             "off": 25,
