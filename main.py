@@ -71,21 +71,6 @@ def process_data():
     else:
         return (jsonify(status=500, data=response[1]))
 
-
-@app.route('/systemState', methods=['GET'])
-def systemState():
-    try:
-        function = pond.systemState() # return layout - [Status, Running, Crashed, Error]
-    except Exception as e: return(jsonify(status=400, data = False, error=str(e)))
-
-    if function[0] != 200: return(jsonify(status=function[0], data = False, error=function[3]))
-
-    else: 
-        if function[2]: # If state is crashed then...
-            return(jsonify(status=200, data = False, error=function[3]))
-        
-        return(jsonify(status=200, data=function[1], error=False))
-
 @app.route('/pondState', methods=['GET'])
 def pondState():
     try:
