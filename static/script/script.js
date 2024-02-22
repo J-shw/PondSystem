@@ -6,40 +6,9 @@ function loadable(){
         document.getElementById("status").style.color = "grey";
     }else {
         getCurrentData();
-        getStatus();
         getPondStatus();
     }
 };
-
-
-function getStatus(){
-    let statusText = document.getElementById("status");
-    fetch('/systemState')
-
-    .then(response => response.json())
-    .then(data=>{
-    
-        if(data.status != 200){
-            statusText.style.color = "#FF0044";
-            statusText.innerHTML = "Crashed";
-            console.log("Get status error - " + data.error + " | " + data.status);
-        }else{
-            if (data.error == false){
-                if (data.data == true) {
-                    statusText.innerHTML = "Running";
-                    statusText.style.color = "#06a85c";
-                } else {
-                    statusText.innerHTML = "Stopped";
-                    statusText.style.color = "black";
-                }
-            }else{
-                statusText.innerHTML = "Crashed";
-                statusText.style.color = "#FF0044";
-                console.log("Status error - " + data.error + " | " + data.status)
-            }
-        }
-    })
-}
 
 function getPondStatus(){
     // pondStateArray = [pondLevelState, Message, innerLevelState, Message, outerLevelState, Message, tubLevelState, Message, pondTemp, Message, waterLevel ('Low', 'Ok', 'High')]
@@ -373,7 +342,6 @@ function water(value){
             resetBtn()
           }, 3000); 
     })
-    getStatus()
 }
 
 setTimeout(() => {
