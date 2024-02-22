@@ -2,6 +2,7 @@ import time, datetime, os, psutil, csv, json, modules.webhook as webhook, statis
 from datetime import datetime as dt
 from w1thermsensor import W1ThermSensor
 import RPi.GPIO as io
+from modules.sysLogger import logger
 # import webhook - Maybe use requests instead
 
 class pc:
@@ -14,8 +15,10 @@ class pc:
 
     # Variables setup
     allData = []
+    configData = {}
     deviceData = []
     data = []
+    lastErrorTime = 0
     levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
     waterState = 'Off' # 'Off', 'Filling', 'Draining'
     nexusPump = True
@@ -411,16 +414,6 @@ def log(data : list, logFilePath : str, logFilesRow : list, current_time : float
         writer = csv.writer(file)
         writer.writerow(dataToSave)
 
-def systemState() -> list: # return layout - [Status, Running, Crashed, Error]
-
-    if pc.crash[0] != True:
-        try:
-            return ([200, True, False])
-        except Exception as e:
-            return([500, None, True, str(e)])
-    else:
-        return ([200, False, pc.crash[0], pc.crash[1]])
-
 def pondStatus() -> list: # Use to keep track of pond alerts
     return [pc.pondStateArray, state.levelSensors]
 
@@ -767,37 +760,24 @@ def updateJson(data : list) -> list:
     
     return [200, "None"]
 
-def logCrash(configData, crashData : list, crashAlerted : bool, crashFilePath : str, lastCrashTime : float): #Changed this to save actual time not time in long format
-
-    crash_time = crashData[2]
-    if crash_time != lastCrashTime:
-        lastCrashTime = crash_time
-
-        time = datetime.datetime.now()
-
-        formatted_date = time.strftime("%Y-%m-%d")
-
-        time_obj = datetime.datetime.fromtimestamp(crash_time)
-        crash_time = time_obj.strftime("%H:%M:%S")
-
-        filename = f"{crashFilePath}{formatted_date}.txt"
-        row = f"{str(crashData[1])}, {str(crash_time)}\n"
-
-        if not os.path.exists(filename):
-            with open(filename, 'w', newline='') as file:
-                file.write(row)
-        else:
-            with open(filename, 'a', newline='') as file:
-                file.write(row)
+def reportCrash():
+    configData = pc.configData
+    tries = 0
+    response = None
+    
+    if time.time+60 > pc.lastErrorTime:
+        while response != 200 and tries < 3:
+            server = configData['webhook']['server']
+            key = configData['webhook']['keys']['alert']
+            response = webhook.send(server, key)
+            tries+=1
+            time.sleep(0.2)
+        pc.lastErrorTime = time.time()
+        if response != 200:
+            logger.warning("Failed to send crash webhook")
         
-    if crashAlerted == False:
-        server = configData['webhook']['server']
-        key = configData['webhook']['keys']['crash']
-        response = webhook.send(server, key)
-        if response == 200:
-            crashAlerted = True
 
- 
+
 def start(): 
 
     runTime = 0
@@ -806,20 +786,11 @@ def start():
 
             try:
                 with open(pc.configPath) as config_file:
-                    configData = json.load(config_file)
-
-                runTime = time.time() + configData['updateFreq']['time']
+                    pc.configData = json.load(config_file)
+                runTime = time.time() + pc.configData['updateFreq']['time']
             except Exception as e:
-                pc.crash = [True, "config | " +str(e), time.time()]
-
-            if pc.crash[0]:
-                logCrash(configData, pc.crash, pc.crashAlerted, pc.crashFilePath, pc.lastCrashTime)
-            else:
-                pc.crashAlerted = False
-
-            try: 
-                if time.time() >= pc.crash[2] + 30: pc.crash = [False, None, None]
-            except: pass
+                logger.critical(e)
+                reportCrash()
 
             current_time = datetime.datetime.now() # Used for logging date/time
 
@@ -827,11 +798,13 @@ def start():
             try:
                 pc.deviceData = getDeviceData()
             except Exception as e:
-                pc.crash = [True, "getDeviceData() | " +str(e), time.time()]
+                logger.critical(e)
+                reportCrash()
             try:
-                pc.data = getData(configData, pc.levelCheckValue)
+                pc.data = getData(pc.configData, pc.levelCheckValue)
             except Exception as e:
-                pc.crash = [True, "getData() | " + str(e), time.time()]
+                logger.critical(e)
+                reportCrash()
             
             pc.allData = [pc.data, pc.deviceData, state.levelSensors]
             # - - - - - - -
@@ -839,21 +812,25 @@ def start():
             try:
                 log(pc.allData, pc.logFilePath, pc.logFilesRow, current_time)
             except Exception as e:
-                pc.crash = [True, "log() | " +str(e), time.time()]
+                logger.critical(e)
+                reportCrash()
 
             try:
-                pondState(configData, pc.allData)
+                pondState(pc.configData, pc.allData)
             except Exception as e:
-                pc.crash = [True, "pondState() | " + str(e), time.time()]
+                logger.critical(e)
+                reportCrash()
 
             try:
-                pumpControl(configData, pc.allData)
+                pumpControl(pc.configData, pc.allData)
             except Exception as e:
-                pc.crash = [True, "pumpControl() | " + str(e), time.time()]
+                logger.critical(e)
+                reportCrash()
 
             try: 
-                cleanMode(configData, pc.allData)
+                cleanMode(pc.configData, pc.allData)
             except Exception as e:
-                pc.crash = [True, "cleanMode() | " + str(e), time.time()]
+                logger.critical(e)
+                reportCrash()
 
         time.sleep(0.2)
