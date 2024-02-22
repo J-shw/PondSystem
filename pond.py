@@ -18,6 +18,7 @@ class pc:
     configData = {}
     deviceData = []
     data = []
+    lastErrorTime = 0
     levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
     waterState = 'Off' # 'Off', 'Filling', 'Draining'
     nexusPump = True
@@ -746,11 +747,17 @@ def reportCrash():
     tries = 0
     response = None
     
-    while response != 200 and tries < 3:
-        server = configData['webhook']['server']
-        key = configData['webhook']['keys']['alert']
-        response = webhook.send(server, key)
-        tries+=1
+    if time.time+60 > pc.lastErrorTime:
+        while response != 200 and tries < 3:
+            server = configData['webhook']['server']
+            key = configData['webhook']['keys']['alert']
+            response = webhook.send(server, key)
+            tries+=1
+            time.sleep(0.2)
+        pc.lastErrorTime = time.time()
+        if response != 200:
+            logger.warning("Failed to send crash webhook")
+        
 
 
 def start(): 
