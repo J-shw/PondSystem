@@ -89,175 +89,35 @@ class state:
     # Sensors | True = Good, False = Bad | pond, inner, outer, tub
     levelSensors = [True, True, True, True]
 
-def pondLevel(configData) -> int:
-    distanceFromBottom = configData['sensorData']['pond']['DFB']
-    runs = configData['sensorData']['pond']['runs']
-    array = []
-    x = 0
+def trig_sonar(echoPin : int, trigPin : int) -> float:
+    run = time.time()
+    failed = False
 
-    while x<runs:
-        run = time.time()
-        failed = False
+    io.output(trigPin, True)
+    time.sleep(0.00001)
+    io.output(trigPin, False)
 
-        io.output(pc.pondTrig, True)
-        time.sleep(0.00001)
-        io.output(pc.pondTrig, False)
+    while io.input(echoPin) == 0 and failed == False:
+        start_time = time.time()
 
-        while io.input(pc.pondEcho) == 0 and failed == False:
-            start_time = time.time()
-
-            if time.time() >= run+2:
-                failed = True
-        
-        if failed:
-            state.levelSensors[0] = False
-            return -1
-        else:
-            state.levelSensors[0] = True
-
-        while io.input(pc.pondEcho) == 1:
-            stop_time = time.time()
-        
-        elapsed_time = stop_time - start_time
-        distance_cm = elapsed_time * 34300 / 2
-        array.append(distance_cm)
-        x+=1
-        time.sleep(0.02)
+        if time.time() >= run+2:
+            failed = True
     
-    try:
-        # calculate the mode
-        mode = statistics.mode(array)
-        waterHeight = distanceFromBottom - mode
+    if failed:
+        return -1
 
-    except statistics.StatisticsError as e:
-        # handle the StatisticsError exception
-        waterHeight = distanceFromBottom - distance_cm
-
-    return round(waterHeight,1)
-
-def nexusInnerLevel(configData) -> int:
-    distanceFromBottom = configData['sensorData']['nexusInnerLevel']['DFB']
-    runs = configData['sensorData']['nexusInnerLevel']['runs']
-    array = []
-    x = 0
-
-    while x<runs:
-        run = time.time()
-        failed = False
-
-        io.output(pc.nInnerTrig, True)
-        time.sleep(0.00001)
-        io.output(pc.nInnerTrig, False)
-
-        while io.input(pc.nInnerEcho) == 0 and failed == False:
-            start_time = time.time()
-
-            if time.time() >= run+2:
-                failed = True
-        
-        if failed:
-            state.levelSensors[1] = False
-            return -1
-        else:
-            state.levelSensors[1] = True
-
-        while io.input(pc.nInnerEcho) == 1:
-            stop_time = time.time()
-        
-        elapsed_time = stop_time - start_time
-        distance_cm = elapsed_time * 34300 / 2
-        array.append(distance_cm)
-        x+=1
-        time.sleep(0.02)
+    while io.input(echoPin) == 1:
+        stop_time = time.time()
     
-    try:
-        # calculate the mode
-        mode = statistics.mode(array)
-        waterHeight = distanceFromBottom - mode
+    elapsed_time = stop_time - start_time
+    return elapsed_time * 34300 / 2 # Distance in CM
 
-    except statistics.StatisticsError as e:
-        # handle the StatisticsError exception
-        waterHeight = distanceFromBottom - distance_cm
-
-    return round(waterHeight,1)
-
-def nexusOuterLevel(configData) -> int:
-    distanceFromBottom = configData['sensorData']['nexusOuterLevel']['DFB']
-    runs = configData['sensorData']['nexusOuterLevel']['runs']
+def getLevel(distanceFromBottom : int, runs : int, echoPin : int, trigPin : int) -> float:
     array = []
     x = 0
 
     while x<runs:
-        run = time.time()
-        failed = False
-
-        io.output(pc.nOuterTrig, True)
-        time.sleep(0.00001)
-        io.output(pc.nOuterTrig, False)
-
-        while io.input(pc.nOuterEcho) == 0 and failed == False:
-            start_time = time.time()
-
-            if time.time() >= run+2:
-                failed = True
-        
-        if failed:
-            state.levelSensors[2] = False
-            return -1
-        else:
-            state.levelSensors[2] = True
-
-        while io.input(pc.nOuterEcho) == 1:
-            stop_time = time.time()
-        
-        elapsed_time = stop_time - start_time
-        distance_cm = elapsed_time * 34300 / 2
-        array.append(distance_cm)
-        x+=1
-        time.sleep(0.02)
-    
-    try:
-        # calculate the mode
-        mode = statistics.mode(array)
-        waterHeight = distanceFromBottom - mode
-
-    except statistics.StatisticsError as e:
-        # handle the StatisticsError exception
-        waterHeight = distanceFromBottom - distance_cm
-
-    return round(waterHeight,1)
-
-def tubLevel(configData) -> int:
-    distanceFromBottom = configData['sensorData']['tubLevel']['DFB']
-    runs = configData['sensorData']['tubLevel']['runs']
-    array = []
-    x = 0
-
-    while x<runs:
-        run = time.time()
-        failed = False
-
-        io.output(pc.tubTrig, True)
-        time.sleep(0.00001)
-        io.output(pc.tubTrig, False)
-
-        while io.input(pc.tubEcho) == 0 and failed == False:
-            start_time = time.time()
-
-            if time.time() >= run+2:
-                failed = True
-        
-        if failed:
-            state.levelSensors[3] = False
-            return -1
-        else:
-            state.levelSensors[3] = True
-
-        while io.input(pc.tubEcho) == 1:
-            stop_time = time.time()
-        
-        elapsed_time = stop_time - start_time
-        distance_cm = elapsed_time * 34300 / 2
+        distance_cm = trig_sonar(echoPin, trigPin)
         array.append(distance_cm)
         x+=1
         time.sleep(0.02)
@@ -338,22 +198,22 @@ def getData(configData, levelCheckValue): # Sensor data
     sensor = W1ThermSensor()
 
     try:
-        pondL = pondLevel(configData)
+        pondL = getLevel(configData['sensorData']['pond']['DFB'], configData['sensorData']['pond']['runs'], pc.pondEcho, pc.pondTrig)
     except: 
         state.levelSensors[0] = False
         pondL = -1
     try:
-        innerL = nexusInnerLevel(configData)
+        innerL = getLevel(configData['sensorData']['nexusInnerLevel']['DFB'], configData['sensorData']['nexusInnerLevel']['runs'], pc.nInnerTrig, pc.nInnerEcho)
     except: 
         state.levelSensors[1] = False
         innerL = -1
     try:
-        outerL = nexusOuterLevel(configData)
+        outerL = getLevel(configData['sensorData']['nexusOuterLevel']['DFB'], configData['sensorData']['nexusOuterLevel']['runs'], pc.nOuterTrig, pc.nOuterEcho)
     except: 
         state.levelSensors[2] = False
         outerL = -1
     try:
-        tubL = tubLevel(configData)
+        tubL = getLevel(configData['sensorData']['tubLevel']['DFB'], configData['sensorData']['tubLevel']['runs'], pc.tubTrig, pc.tubEcho)
     except: 
         state.levelSensors[3] = False
         tubL = -1
@@ -363,24 +223,36 @@ def getData(configData, levelCheckValue): # Sensor data
     except: waterTemp = 0
 
     if pondL <= -1:
+        state.levelSensors[0] = False
         try:pondL = pc.lastPondLevel
         except:pass
-    else:pc.lastPondLevel = pondL
+    else:
+        state.levelSensors[0] = True
+        pc.lastPondLevel = pondL
 
     if innerL <= -1:
+        state.levelSensors[1] = False
         try:innerL = pc.lastInnerLevel
         except:pass
-    else:pc.lastInnerLevel = innerL
+    else:
+        state.levelSensors[1] = True
+        pc.lastInnerLevel = innerL
 
     if outerL <= -1:
+        state.levelSensors[2] = False
         try:outerL = pc.lastOuterLevel
         except:pass
-    else:pc.lastOuterLevel = outerL
+    else:
+        state.levelSensors[2] = True
+        pc.lastOuterLevel = outerL
 
     if tubL <= -1:
+        state.levelSensors[3] = False
         try:tubL = pc.lastTubLevel
         except:pass
-    else:pc.lastTubLevel = tubL
+    else:
+        state.levelSensors[3] = True
+        pc.lastTubLevel = tubL
 
     return [pondL, innerL, outerL, tubL, waterTemp, levelCheckValue]
 
