@@ -125,7 +125,7 @@ def getLevel(distanceFromBottom : int, runs : int, echoPin : int, trigPin : int)
 
     threshold = 1
     median = statistics.median(array)
-    
+
     for distance in array:
         if not distance > median+threshold and not distance < median-distance:
             smoothed_distance_cm.append(distance)
@@ -211,17 +211,17 @@ def getData(configData, levelCheckValue): # Sensor data
         state.levelSensors[0] = False
         pondL = -1
     try:
-        innerL = getLevel(configData['sensorData']['nexusInnerLevel']['DFB'], configData['sensorData']['nexusInnerLevel']['runs'], pc.nInnerTrig, pc.nInnerEcho)
+        innerL = getLevel(configData['sensorData']['nexusInnerLevel']['DFB'], configData['sensorData']['nexusInnerLevel']['runs'], pc.nInnerEcho, pc.nInnerTrig)
     except: 
         state.levelSensors[1] = False
         innerL = -1
     try:
-        outerL = getLevel(configData['sensorData']['nexusOuterLevel']['DFB'], configData['sensorData']['nexusOuterLevel']['runs'], pc.nOuterTrig, pc.nOuterEcho)
+        outerL = getLevel(configData['sensorData']['nexusOuterLevel']['DFB'], configData['sensorData']['nexusOuterLevel']['runs'], pc.nOuterEcho, pc.nOuterTrig)
     except: 
         state.levelSensors[2] = False
         outerL = -1
     try:
-        tubL = getLevel(configData['sensorData']['tubLevel']['DFB'], configData['sensorData']['tubLevel']['runs'], pc.tubTrig, pc.tubEcho)
+        tubL = getLevel(configData['sensorData']['tubLevel']['DFB'], configData['sensorData']['tubLevel']['runs'], pc.tubEcho, pc.tubTrig)
     except: 
         state.levelSensors[3] = False
         tubL = -1
