@@ -19,19 +19,11 @@ class pc:
     deviceData = []
     data = []
     lastErrorTime = 0
-    levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
-    waterState = 'Off' # 'Off', 'Filling', 'Draining'
-    nexusPump = True
-    tubPump = True
     pumpTimeData = [0, 0]
     update = False # Used for webhook
     crash = [False, None, None]
     pondStateArray = [False, "", False, "", False, "", False, "", False, "", "Ok", False, "", False] # [pondLevelState, Message, innerLevelState, Message, outerLevelState, Message, tubLevelState, Message, pondTemp, Message, waterLevel ('Low', 'Ok', 'High'), Cleaning, endtime, ofp (overflow protection)]
     pondStateTime = [0,0,0,0,0]
-    alerted = False
-    crashAlerted = False
-    cleaning = False
-    ofp = False
     cleaningEndTime = 0
     # - - - - - - - 
 
@@ -81,6 +73,18 @@ class pc:
     io.setup(tubEcho, io.IN)
     # - - - - - - - 
 
+class flag:
+    alerted = False
+    crashAlerted = False
+    cleaning = False
+    ofp = False
+
+    nexusPump = True
+    tubPump = True
+
+    levelCheckValue = 'Ok' # 'Ok', 'Low, 'High'
+    waterState = 'Off' # 'Off', 'Filling', 'Draining'
+    
 class state:
     # Sensors | True = Good, False = Bad | pond, inner, outer, tub
     levelSensors = [True, True, True, True]
@@ -271,27 +275,27 @@ def tubLevel(configData) -> int:
 
 def water(state : bool): # on/off the refill system
 
-    if pc.waterState != "Draining":
+    if flag.waterState != "Draining":
         if state:
             #Turn water on
-            pc.waterState = 'Filling'
+            flag.waterState = 'Filling'
             io.output(pc.refillRelay, io.HIGH)
         else:
             #Turn water off
-            pc.waterState = 'Off'
+            flag.waterState = 'Off'
             io.output(pc.refillRelay, io.LOW)
     else: return "Invalid operation - System is currently draining"
 
 def empty(state : bool): # on/off the empty system
 
-    if pc.waterState != "Filling":
+    if flag.waterState != "Filling":
         if state:
             #Turn water on
-            pc.waterState = 'Draining'
+            flag.waterState = 'Draining'
             io.output(pc.emptyRelay, io.HIGH)
         else:
             #Turn water off
-            pc.waterState = 'Off'
+            flag.waterState = 'Off'
             io.output(pc.emptyRelay, io.LOW)
     else: return "Invalid operation - System is currently filling"
 
@@ -300,20 +304,20 @@ def pump(pumpNo : int, state : bool): # on/off specific pump
     if pumpNo == 1:
         if state:
             #Turn nexus pump on
-            pc.nexusPump = True
+            flag.nexusPump = True
             io.output(pc.nexusRelay, io.LOW)
         else:
             #Turn nexus pump off
-            pc.nexusPump = False
+            flag.nexusPump = False
             io.output(pc.nexusRelay, io.HIGH)
     elif pumpNo == 2:
         if state:
             #Turn tub pump on
-            pc.tubPump = True
+            flag.tubPump = True
             io.output(pc.tubRelay, io.LOW)
         else:
             #Turn tub pump off
-            pc.tubPump = False
+            flag.tubPump = False
             io.output(pc.tubRelay, io.HIGH)
 
 def getDeviceData(): # Device data
@@ -419,7 +423,7 @@ def pondStatus() -> list: # Use to keep track of pond alerts
 
 def currentData() -> list: # Displays current data on webpage
 
-    dataToShare = [pc.waterState, pc.nexusPump, pc.tubPump]
+    dataToShare = [flag.waterState, flag.nexusPump, flag.tubPump]
 
     for x in pc.allData:
         for i in x:
@@ -458,22 +462,22 @@ def pondState(configData, allData : list): # Controls pond systems
     endTimeDatetime = dt.fromtimestamp(pc.cleaningEndTime)
     cleaningEndTimeStr = endTimeDatetime.strftime('%H:%M')
     
-    pc.pondStateArray[11] = pc.cleaning
+    pc.pondStateArray[11] = flag.cleaning
     pc.pondStateArray[12] = cleaningEndTimeStr
-    pc.pondStateArray[13] = pc.ofp
+    pc.pondStateArray[13] = flag.ofp
 
     raw_levelCheckValue = levelCheck(configData, pondLevel)
     if raw_levelCheckValue != None:
-        pc.levelCheckValue = raw_levelCheckValue
-        pc.pondStateArray[10] = pc.levelCheckValue
+        flag.levelCheckValue = raw_levelCheckValue
+        pc.pondStateArray[10] = flag.levelCheckValue
     
-    if pc.levelCheckValue == 'Low' and pondLevel > 0:
+    if flag.levelCheckValue == 'Low' and pondLevel > 0:
         if not configData['waterLevels']['levelCheck']['refill']:
             water(False)
         else:
             water(True)
     else:
-        if configData['waterLevels']['levelCheck']['autoShutoff'] and pc.waterState == 'Filling':
+        if configData['waterLevels']['levelCheck']['autoShutoff'] and flag.waterState == 'Filling':
             refillShutOff()
         water(False)
 
@@ -560,14 +564,14 @@ def pondState(configData, allData : list): # Controls pond systems
         pc.pondStateArray[7] = ""
         pc.pondStateTime[3] = 0
     
-    if alert and pc.alerted == False and pc.cleaning == False:
+    if alert and flag.alerted == False and flag.cleaning == False:
         server = configData['webhook']['server']
         key = configData['webhook']['keys']['alert']
         response = webhook.send(server, key)
         if response == 200:
-            pc.alerted = True
+            flag.alerted = True
     if alert == False:
-        pc.alerted = False
+        flag.alerted = False
 
 def pumpControl(configData, allData : list):
 
@@ -579,7 +583,7 @@ def pumpControl(configData, allData : list):
     outerLevel = waterData[2]
     tubLevel = waterData[3]
     if configData['pumpControl']['enabled']:
-        if not pc.cleaning:
+        if not flag.cleaning:
             if outerLevel <= nexusValues['off']:
                 pc.pumpTimeData[0] = time.time()
                 pump(1, False)
@@ -642,28 +646,28 @@ def cleanMode(configData, allData : list): # Automatic cleaning
     duration = configData['cleaning']['duration']
     levelBounce = configData['cleaning']['levelBounce']
 
-    if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and pc.cleaning:
-        pc.ofp = True # overflow Protection
-    elif schedule[day_of_week] == 'true' and not pc.cleaning:
+    if outerLevel > nexusOuterMax or innerLevel > nexusInnerMax and flag.cleaning:
+        flag.ofp = True # overflow Protection
+    elif schedule[day_of_week] == 'true' and not flag.cleaning:
         if str(timeObj) == timeStr:
-            pc.cleaning = True
+            flag.cleaning = True
             if time.time() > pc.cleaningEndTime:
                 pc.cleaningEndTime = time.time() + (duration * 60)
 
-    elif time.time() > pc.cleaningEndTime and pc.cleaning:
-        pc.cleaning = False
+    elif time.time() > pc.cleaningEndTime and flag.cleaning:
+        flag.cleaning = False
 
-    if pc.ofp: # Reset ofp
+    if flag.ofp: # Reset ofp
         if outerLevel < nexusOuterMax-levelBounce and innerLevel < nexusInnerMax-levelBounce:
-            pc.ofp = False
-        elif not pc.cleaning:
-            pc.ofp = False
+            flag.ofp = False
+        elif not flag.cleaning:
+            flag.ofp = False
 
-    if pc.cleaning:
+    if flag.cleaning:
         # This will hold auto drainage and air system
         # For now it will slow the water flow and allow dirt
         # to settle on the floor
-        if not pc.ofp:
+        if not flag.ofp:
             pump(1, False)
         else: pump(1, True)
 
@@ -801,7 +805,7 @@ def start():
                 logger.critical(e)
                 reportCrash()
             try:
-                pc.data = getData(pc.configData, pc.levelCheckValue)
+                pc.data = getData(pc.configData, flag.levelCheckValue)
             except Exception as e:
                 logger.critical(e)
                 reportCrash()
