@@ -114,6 +114,7 @@ def trig_sonar(echoPin : int, trigPin : int) -> float:
 
 def getLevel(distanceFromBottom : int, runs : int, echoPin : int, trigPin : int) -> float:
     array = []
+    smoothed_distance_cm = []
     x = 0
 
     while x<runs:
@@ -121,10 +122,17 @@ def getLevel(distanceFromBottom : int, runs : int, echoPin : int, trigPin : int)
         array.append(distance_cm)
         x+=1
         time.sleep(0.02)
+
+    threshold = 1
+    median = statistics.median(array)
+    
+    for distance in array:
+        if not distance > median+threshold and not distance < median-distance:
+            smoothed_distance_cm.append(distance)
     
     try:
         # calculate the mode
-        mode = statistics.mode(array)
+        mode = statistics.mode(smoothed_distance_cm)
         waterHeight = distanceFromBottom - mode
 
     except statistics.StatisticsError as e:
