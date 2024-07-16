@@ -112,10 +112,12 @@ def trig_sonar(echoPin : int, trigPin : int) -> float:
     elapsed_time = stop_time - start_time
     return elapsed_time * 34300 / 2 # Distance in CM
 
-def getLevel(distanceFromBottom : int, runs : int, echoPin : int, trigPin : int) -> float:
+def getLevel(config : dict, echoPin : int, trigPin : int) -> float:
     array = []
     smoothed_distance_cm = []
     x = 0
+    runs = config['runs']
+    distanceFromBottom = config['DFB']
 
     while x<runs:
         distance_cm = trig_sonar(echoPin, trigPin)
@@ -206,22 +208,22 @@ def getData(configData, levelCheckValue): # Sensor data
     sensor = W1ThermSensor()
 
     try:
-        pondL = getLevel(configData['sensorData']['pond']['DFB'], configData['sensorData']['pond']['runs'], pc.pondEcho, pc.pondTrig)
+        pondL = getLevel(configData['sensorData']['pond'], pc.pondEcho, pc.pondTrig)
     except: 
         state.levelSensors[0] = False
         pondL = -1
     try:
-        innerL = getLevel(configData['sensorData']['nexusInnerLevel']['DFB'], configData['sensorData']['nexusInnerLevel']['runs'], pc.nInnerEcho, pc.nInnerTrig)
+        innerL = getLevel(configData['sensorData']['nexusInnerLevel'], pc.nInnerEcho, pc.nInnerTrig)
     except: 
         state.levelSensors[1] = False
         innerL = -1
     try:
-        outerL = getLevel(configData['sensorData']['nexusOuterLevel']['DFB'], configData['sensorData']['nexusOuterLevel']['runs'], pc.nOuterEcho, pc.nOuterTrig)
+        outerL = getLevel(configData['sensorData']['nexusOuterLevel'], pc.nOuterEcho, pc.nOuterTrig)
     except: 
         state.levelSensors[2] = False
         outerL = -1
     try:
-        tubL = getLevel(configData['sensorData']['tubLevel']['DFB'], configData['sensorData']['tubLevel']['runs'], pc.tubEcho, pc.tubTrig)
+        tubL = getLevel(configData['sensorData']['tubLevel'], pc.tubEcho, pc.tubTrig)
     except: 
         state.levelSensors[3] = False
         tubL = -1
