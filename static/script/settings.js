@@ -58,6 +58,7 @@ function getData(){
             cleaningDuration = document.getElementById("cleaningDuration");
             cleaningLevelBounce = document.getElementById("cleaningLevelBounce");
 
+            autoShutOff = document.getElementById("autoShutOff");
             refill = document.getElementById("refill");
             pumpControl = document.getElementById("pumpControl");
 
@@ -133,6 +134,11 @@ function getData(){
             }else{
                 sunday.checked = false;
             }
+            if (data['waterLevels']['levelCheck']['autoShutoff'] === true){
+                autoShutOff.checked = true;
+            }else{
+                autoShutOff.checked = false;
+            }
             if (data['waterLevels']['levelCheck']['refill'] === true){
                 refill.checked = true;
             }else{
@@ -152,7 +158,7 @@ function getData(){
 }
 
 function updateJson(){
-    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHighCheck', 'pondLowCheck', 'pondOkCheck', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce', 'refill', 'pumpControl']
+    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHighCheck', 'pondLowCheck', 'pondOkCheck', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce', 'refill', 'pumpControl', 'autoShutOff']
 
     let data = [];
 

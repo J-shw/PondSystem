@@ -634,6 +634,7 @@ def updateJson(data : list) -> list:
 
         config['waterLevels']['levelCheck']['refill'] = data[39]
         config['pumpControl']['enabled'] = data[40]
+        config['waterLevels']['levelCheck']['autoShutoff'] = data[41]
 
 
     
