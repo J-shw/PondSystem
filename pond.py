@@ -1,4 +1,4 @@
-import time, datetime, os, psutil, csv, json, modules.webhook as webhook, statistics
+import time, datetime, os, psutil, csv, json, modules.webhook as webhook, statistics, asyncio
 from datetime import datetime as dt
 from w1thermsensor import W1ThermSensor
 import RPi.GPIO as io
@@ -78,6 +78,7 @@ class flag:
     crashAlerted = False
     cleaning = False
     ofp = False
+    manual_watering = False
 
     nexusPump = True
     tubPump = True
@@ -88,7 +89,7 @@ class flag:
 class state:
     # Sensors | True = Good, False = Bad | pond, inner, outer, tub
     levelSensors = [True, True, True, True]
-
+   
 def trig_sonar(echoPin : int, trigPin : int) -> float:
     run = time.time()
     failed = False
@@ -352,16 +353,20 @@ def pondState(configData, allData : list): # Controls pond systems
     if raw_levelCheckValue != None:
         flag.levelCheckValue = raw_levelCheckValue
         pc.pondStateArray[10] = flag.levelCheckValue
-    
-    if flag.levelCheckValue == 'Low' and pondLevel > 0:
-        if not configData['waterLevels']['levelCheck']['refill']:
-            water(False)
+
+    if not configData['manual-refill']['enabled'] :
+        if flag.levelCheckValue == 'Low' and pondLevel > 0:
+            if not configData['waterLevels']['levelCheck']['refill']:
+                water(False)
+            else:
+                water(True)
         else:
-            water(True)
+            if configData['waterLevels']['levelCheck']['autoShutoff'] and flag.waterState == 'Filling':
+                refillShutOff()
+            water(False)
     else:
-        if configData['waterLevels']['levelCheck']['autoShutoff'] and flag.waterState == 'Filling':
-            refillShutOff()
-        water(False)
+        water(flag.manual_watering)
+            
 
 
     # - - -
@@ -635,9 +640,7 @@ def updateJson(data : list) -> list:
         config['waterLevels']['levelCheck']['refill'] = data[39]
         config['pumpControl']['enabled'] = data[40]
         config['waterLevels']['levelCheck']['autoShutoff'] = data[41]
-
-
-    
+        config['manual-refill']['enabled'] = data[42]
 
         # Write the modified object back to the JSON file
         with open(pc.configPath, "w") as outfile:
@@ -668,6 +671,8 @@ def reportCrash():
 def start(): 
 
     runTime = 0
+    manualTime = 0
+    manualWater_set = False
     while True:
         if time.time() >= runTime:
 
@@ -719,5 +724,12 @@ def start():
             except Exception as e:
                 logger.critical(e)
                 reportCrash()
-
+        
+        if pc.configData['manual-refill']['enabled'] and flag.manual_watering:
+            if time.time() >= manualTime and manualWater_set:
+                flag.manual_watering = False
+                manualWater_set = False
+            elif not manualWater_set:
+                manualTime = time.time() + (pc.configData['manual-refill']['time-on-minutes'] * 60)
+                manualWater_set = True
         time.sleep(0.2)

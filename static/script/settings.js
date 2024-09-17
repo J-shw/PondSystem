@@ -60,6 +60,7 @@ function getData(){
 
             autoShutOff = document.getElementById("autoShutOff");
             refill = document.getElementById("refill");
+            manualRefill = document.getElementById("manualRefill");
             pumpControl = document.getElementById("pumpControl");
 
             pondhigh.value = data['waterLevels']['pond']['high'];
@@ -144,6 +145,11 @@ function getData(){
             }else{
                 refill.checked = false;
             }
+            if (data['manual-refill'] === true){
+                manualRefill.checked = true
+            }else{
+                manualRefill.checked = false
+            }
             if (data['pumpControl']['enabled'] === true){
                 pumpControl.checked = true;
             }else{
@@ -158,7 +164,7 @@ function getData(){
 }
 
 function updateJson(){
-    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHighCheck', 'pondLowCheck', 'pondOkCheck', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce', 'refill', 'pumpControl', 'autoShutOff']
+    const values = ['pondHigh', 'pondLow', 'pondAlert', 'innerHigh', 'innerLow', 'innerAlert', 'outerHigh', 'outerLow', 'outerAlert', 'tubHigh', 'tubLow', 'tubAlert', 'pondDFB', 'pondRuns', 'innerDFB', 'innerRuns', 'outerDFB', 'outerRuns', 'tubDFB', 'tubRuns', 'nPumpOff', 'nPumpOn', 'nPumpDelay', 'tPumpOff', 'tPumpOn', 'tPumpDelay', 'pondHighCheck', 'pondLowCheck', 'pondOkCheck', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday', 'cleaningTime', 'cleaningDuration', 'cleaningLevelBounce', 'refill', 'pumpControl', 'autoShutOff', 'manualRefill']
 
     let data = [];
 
@@ -174,8 +180,7 @@ function updateJson(){
         }
         data.push(selectValue);
     }
-
-    console.log(data)
+    
     let url = "/process-data"
     let xhttp = new XMLHttpRequest();
 
