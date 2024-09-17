@@ -89,12 +89,7 @@ class flag:
 class state:
     # Sensors | True = Good, False = Bad | pond, inner, outer, tub
     levelSensors = [True, True, True, True]
-
-async def manual_water():
-    config = getConfig()
-    await asyncio.sleep(config['manual-refill']['time-on-minutes'] * 60)  # Asynchronous sleep
-    flag.manual_watering = False
-
+   
 def trig_sonar(echoPin : int, trigPin : int) -> float:
     run = time.time()
     failed = False
@@ -676,6 +671,8 @@ def reportCrash():
 def start(): 
 
     runTime = 0
+    manualTime = 0
+    manualWater_set = False
     while True:
         if time.time() >= runTime:
 
@@ -727,5 +724,12 @@ def start():
             except Exception as e:
                 logger.critical(e)
                 reportCrash()
-
+        
+        if pc.configData['manual-refill']['enabled'] and flag.manual_watering:
+            if time.time() >= manualTime and manualWater_set:
+                flag.manual_watering = False
+                manualWater_set = False
+            elif not manualWater_set:
+                manualTime = time.time() + (pc.configData['manual-refill']['time-on-minutes'] * 60)
+                manualWater_set = True
         time.sleep(0.2)
