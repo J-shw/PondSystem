@@ -645,9 +645,7 @@ def updateJson(data : list) -> list:
         config['waterLevels']['levelCheck']['refill'] = data[39]
         config['pumpControl']['enabled'] = data[40]
         config['waterLevels']['levelCheck']['autoShutoff'] = data[41]
-
-
-    
+        config['manual-refill']['enabled'] = data[42]
 
         # Write the modified object back to the JSON file
         with open(pc.configPath, "w") as outfile:
