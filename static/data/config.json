@@ -91,5 +91,9 @@
             "alert": "ALERT_KEY_HERE",
             "crash": "CRASH_KEY_HERE"
         }
+    },
+    "manual-refill": {
+        "enabled": false,
+        "time-on-minutes": 60 
     }
 }
