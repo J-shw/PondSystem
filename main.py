@@ -5,8 +5,9 @@ from datetime import datetime
 import time, os, threading, pond, csv, asyncio
 
 """
-Librarys to install:
+Libraries to install:
 pip install flask
+pip install "Flask[async]"
 pip install waitress
 pip install psutil
 """
