@@ -2,7 +2,7 @@
 from flask import Flask, render_template, jsonify, request
 from waitress import serve
 from datetime import datetime
-import time, os, threading, pond, csv
+import time, os, threading, pond, csv, asyncio
 
 """
 Librarys to install:
@@ -98,6 +98,14 @@ def water(value):
     except Exception as e:
         return jsonify(status=500, data=str(e))
     return jsonify(status=200, data=None)
+
+@app.route('/manual_water', methods=['GET'])
+async def trigger_variable():
+    if not pond.flag.manual_watering:
+        pond.flag.manual_watering = True
+        asyncio.create_task(pond.manual_water())  # Create a task to run in the background
+        return jsonify(status=200, data="Started")
+    return jsonify(status=200, data="Already set")
 
 @app.route('/data-between/<startDate>/<endDate>', methods=['GET'])
 def dataBetween(startDate, endDate): # "2023-04-09", "2023-04-16"
