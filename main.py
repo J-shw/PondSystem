@@ -99,8 +99,8 @@ def water(value):
         return jsonify(status=500, data=str(e))
     return jsonify(status=200, data=None)
 
-@app.route('/manual_water', methods=['GET'])
-async def trigger_variable():
+@app.route('/manual_refill', methods=['GET'])
+async def manual_refill():
     if not pond.flag.manual_watering:
         pond.flag.manual_watering = True
         asyncio.create_task(pond.manual_water())  # Create a task to run in the background
