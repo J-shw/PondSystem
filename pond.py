@@ -92,7 +92,7 @@ class state:
 
 async def manual_water():
     config = getConfig()
-    await asyncio.sleep(config['manual-refill']['time-on-minutes'] * 60)  # Asynchronous sleep for 30 minutes
+    await asyncio.sleep(config['manual-refill']['time-on-minutes'] * 60)  # Asynchronous sleep
     flag.manual_watering = False
 
 def trig_sonar(echoPin : int, trigPin : int) -> float:
