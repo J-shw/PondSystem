@@ -88,7 +88,7 @@ class flag:
     
 class state:
     # Sensors | True = Good, False = Bad | pond, inner, outer, tub
-    levelSensors = [True, True, True, True]
+    levelSensors = {"pond": True, "inner": True, "outer": True, "tub": True}
    
 def trig_sonar(echoPin : int, trigPin : int) -> float:
     run = time.time()
@@ -211,22 +211,22 @@ def getData(configData, levelCheckValue): # Sensor data
     try:
         pondL = getLevel(configData['sensorData']['pond'], pc.pondEcho, pc.pondTrig)
     except: 
-        state.levelSensors[0] = False
+        state.levelSensors.pond = False
         pondL = -1
     try:
         innerL = getLevel(configData['sensorData']['nexusInnerLevel'], pc.nInnerEcho, pc.nInnerTrig)
     except: 
-        state.levelSensors[1] = False
+        state.levelSensors.inner = False
         innerL = -1
     try:
         outerL = getLevel(configData['sensorData']['nexusOuterLevel'], pc.nOuterEcho, pc.nOuterTrig)
     except: 
-        state.levelSensors[2] = False
+        state.levelSensors.outer = False
         outerL = -1
     try:
         tubL = getLevel(configData['sensorData']['tubLevel'], pc.tubEcho, pc.tubTrig)
     except: 
-        state.levelSensors[3] = False
+        state.levelSensors.tub = False
         tubL = -1
     
     try:
@@ -234,38 +234,38 @@ def getData(configData, levelCheckValue): # Sensor data
     except: waterTemp = 0
 
     if pondL <= -1:
-        state.levelSensors[0] = False
+        state.levelSensors.pond = False
         try:pondL = pc.lastPondLevel
         except:pass
     else:
-        state.levelSensors[0] = True
+        state.levelSensors.pond = True
         pc.lastPondLevel = pondL
 
     if innerL <= -1:
-        state.levelSensors[1] = False
+        state.levelSensors.inner = False
         try:innerL = pc.lastInnerLevel
         except:pass
     else:
-        state.levelSensors[1] = True
+        state.levelSensors.inner = True
         pc.lastInnerLevel = innerL
 
     if outerL <= -1:
-        state.levelSensors[2] = False
+        state.levelSensors.outer = False
         try:outerL = pc.lastOuterLevel
         except:pass
     else:
-        state.levelSensors[2] = True
+        state.levelSensors.outer = True
         pc.lastOuterLevel = outerL
 
     if tubL <= -1:
-        state.levelSensors[3] = False
+        state.levelSensors.tub = False
         try:tubL = pc.lastTubLevel
         except:pass
     else:
-        state.levelSensors[3] = True
+        state.levelSensors.tub = True
         pc.lastTubLevel = tubL
 
-    return [pondL, innerL, outerL, tubL, waterTemp, levelCheckValue]
+    return {"pondLevel": pondL, "innerLevel": innerL, "outerLevel": outerL, "tubLevel": tubL, "waterTemp": waterTemp, "levelCheck": levelCheckValue}
 
 def log(data : list, logFilePath : str, logFilesRow : list, current_time : float) : # Used to save/log data
 
@@ -698,7 +698,7 @@ def start():
                 logger.critical(e)
                 reportCrash()
             
-            pc.allData = [pc.data, pc.deviceData, state.levelSensors]
+            pc.allData = {"pondData": pc.data, "deviceData": pc.deviceData, "levelData": state.levelSensors}
             # - - - - - - -
 
             try:
